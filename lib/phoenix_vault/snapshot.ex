@@ -11,6 +11,7 @@ defmodule PhoenixVault.Snapshot do
 
   @doc false
   def changeset(snapshot, attrs) do
+    # TODO validate url
     snapshot
     |> cast(attrs, [:title, :url])
     |> validate_required([:title, :url])
