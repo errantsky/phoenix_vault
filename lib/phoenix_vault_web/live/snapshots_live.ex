@@ -3,7 +3,7 @@ defmodule PhoenixVaultWeb.SnapshotsLive do
   use Phoenix.LiveView
   
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok, assign(socket, :snapshots, Repo.all(Snapshot))}
   end
 
   def render(assigns) do
@@ -21,7 +21,7 @@ defmodule PhoenixVaultWeb.SnapshotsLive do
           </tr>
         </thead>
         <tbody>
-          <%= for snapshot <- PhoenixVault.Repo.all(PhoenixVault.Snapshot) do %>
+          <%= for snapshot <- @snapshots do %>
             <tr>
               <td><%= snapshot.inserted_at %></td>
               <td><%= snapshot.title %></td>
