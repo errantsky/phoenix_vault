@@ -17,7 +17,8 @@ defmodule PhoenixVaultWeb.Router do
   scope "/", PhoenixVaultWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    # get "/", PageController, :home
+    live "/", SnapshotsLive, :list_snapshots
   end
 
   # Other scopes may use custom stacks.
