@@ -1,7 +1,7 @@
 defmodule PhoenixVaultWeb.SnapshotsLive do
   alias PhoenixVault.{Repo, Snapshot}
-  use Phoenix.LiveView
-  
+  use PhoenixVaultWeb, :live_view
+
   def mount(_params, _session, socket) do
     {:ok, assign(socket, :snapshots, Repo.all(Snapshot))}
   end
