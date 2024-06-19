@@ -1,0 +1,45 @@
+<.header>
+  Snapshot <%= @snapshot.id %>
+  <:subtitle>This is a snapshot record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/snapshots/#{@snapshot}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit snapshot</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Title">
+    <%= @snapshot.title %>
+  </:item>
+  <:item title="URL">
+    <%= @snapshot.url %>
+  </:item>
+  <:item title="Tags">
+    <%= Enum.map(@snapshot.tags, fn tag -> tag.name end) |> Enum.join(", ") %>
+  </:item>
+  <:item title="Inserted At">
+    <%= @snapshot.inserted_at %>
+  </:item>
+  <:item title="Updated At">
+    <%= @snapshot.updated_at %>
+  </:item>
+</.list>
+
+<.back navigate={~p"/snapshots"}>Back to snapshots</.back>
+
+<.modal
+  :if={@live_action == :edit}
+  id="snapshot-modal"
+  show
+  on_cancel={JS.patch(~p"/snapshots/#{@snapshot}")}
+>
+  <.live_component
+    module={PhoenixVaultWeb.SnapshotLive.FormComponent}
+    id={@snapshot.id}
+    title={@page_title}
+    action={@live_action}
+    snapshot={@snapshot}
+    patch={~p"/snapshots/#{@snapshot}"}
+  />
+</.modal>

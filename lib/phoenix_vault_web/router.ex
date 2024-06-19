@@ -18,7 +18,13 @@ defmodule PhoenixVaultWeb.Router do
     pipe_through :browser
 
     # get "/", PageController, :home
-    live "/", SnapshotsLive, :list_snapshots
+    # live "/", SnapshotsLive, :list_snapshots
+    live "/snapshots", SnapshotLive.Index, :index
+    live "/snapshots/new", SnapshotLive.Index, :new
+    live "/snapshots/:id/edit", SnapshotLive.Index, :edit
+
+    live "/snapshots/:id", SnapshotLive.Show, :show
+    live "/snapshots/:id/show/edit", SnapshotLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.

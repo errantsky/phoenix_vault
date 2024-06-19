@@ -1,4 +1,5 @@
 defmodule PhoenixVault.Snapshot do
+  require Logger
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -19,6 +20,6 @@ defmodule PhoenixVault.Snapshot do
     |> cast(attrs, [:title, :url])
     |> validate_required([:title, :url])
     |> unique_constraint(:url)
-    |> put_assoc(:tags, Map.get(attrs, :tags, []))
+    |> put_assoc(:tags, Map.get(attrs, "tags", []))
   end
 end
