@@ -107,7 +107,7 @@ defmodule PhoenixVault.Archive do
 
   """
   def delete_snapshot(%Snapshot{} = snapshot) do
-    raise "TODO"
+    Repo.delete(snapshot)
   end
 
   @doc """
