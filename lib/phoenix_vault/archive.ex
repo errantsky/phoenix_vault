@@ -53,7 +53,14 @@ defmodule PhoenixVault.Archive do
 
   """
   def create_snapshot(attrs \\ %{}) do
-    Repo.insert(%Snapshot{url: attrs[:url], title: attrs[:title]})
+    tags =
+      String.split(attrs["tags"], ",")
+      |> Enum.map(&String.trim/1)
+      |> Enum.map(fn name -> %Tag{name: name} end)
+
+    Logger.debug("create_snapshot: #{inspect(attrs)}")
+
+    Repo.insert(%Snapshot{url: attrs["url"], title: attrs["title"], tags: tags})
   end
 
   @doc """
@@ -69,27 +76,29 @@ defmodule PhoenixVault.Archive do
 
   """
   def update_snapshot(%Snapshot{} = snapshot, attrs) do
-    tag_structs = Map.get(attrs, "tags")
+    tag_structs =
+      Map.get(attrs, "tags")
       |> String.split(",")
       |> Enum.map(&String.trim/1)
       |> Enum.map(fn name -> %Tag{name: name} end)
+
     Logger.debug("tag_structs is: #{inspect(tag_structs)}")
-    
+
     attrs = Map.put(attrs, "tags", tag_structs)
     Logger.debug("attrs is: #{inspect(attrs)}")
-    
+
     snapshot = Repo.preload(snapshot, :tags)
     changeset = Snapshot.changeset(snapshot, attrs)
-    
+
     Logger.debug("changeset is: #{inspect(changeset)}")
 
     case Repo.update(changeset) do
       {:ok, updated_snapshot} ->
-      Logger.debug("updated_snapshot is: #{inspect(updated_snapshot)}")
+        Logger.debug("updated_snapshot is: #{inspect(updated_snapshot)}")
         {:ok, updated_snapshot}
 
       {:error, changeset} ->
-      Logger.debug("error is: #{inspect(changeset)}")
+        Logger.debug("error is: #{inspect(changeset)}")
         {:error, changeset}
     end
   end
@@ -127,7 +136,7 @@ defmodule PhoenixVault.Archive do
     #   |> Enum.map(&%Tag{name: &1})
     #   attrs = Map.put(attrs, :tags, tags)
     # end
-    
+
     Snapshot.changeset(snapshot, attrs)
   end
 end
