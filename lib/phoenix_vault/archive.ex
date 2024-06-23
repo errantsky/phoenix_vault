@@ -5,6 +5,7 @@ defmodule PhoenixVault.Archive do
 
   import Ecto.Query, warn: false
   require Logger
+  alias PhoenixVault.Archivers.ArchiverSupervisor
   alias PhoenixVault.Tag
   alias PhoenixVault.Repo
 
@@ -60,7 +61,10 @@ defmodule PhoenixVault.Archive do
 
     Logger.debug("create_snapshot: #{inspect(attrs)}")
 
-    Repo.insert(%Snapshot{url: attrs["url"], title: attrs["title"], tags: tags})
+    {:ok, snapshot} = Repo.insert(%Snapshot{url: attrs["url"], title: attrs["title"], tags: tags})
+    ArchiverSupervisor.start_link(snapshot)
+    
+    {:ok, snapshot}
   end
 
   @doc """

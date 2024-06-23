@@ -17,7 +17,8 @@ defmodule PhoenixVault.Application do
       # Start a worker by calling: PhoenixVault.Worker.start_link(arg)
       # {PhoenixVault.Worker, arg},
       # Start to serve requests, typically the last entry
-      PhoenixVaultWeb.Endpoint
+      PhoenixVaultWeb.Endpoint,
+      ChromicPDF
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
