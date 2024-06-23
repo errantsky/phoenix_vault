@@ -6,7 +6,7 @@ defmodule PhoenixVault.SnapshotTag do
   schema "snapshot_tags" do
     belongs_to :snapshot, PhoenixVault.Snapshot
     belongs_to :tag, PhoenixVault.Tag
-    
+
     timestamps(type: :utc_datetime)
   end
 

@@ -2,7 +2,7 @@ defmodule PhoenixVault.Archivers.ArchiverConfig do
   @moduledoc """
   Shared configuration for archiver processes.
   """
-  
+
   alias PhoenixVault.Snapshot
 
   @base_dir "priv/archive"

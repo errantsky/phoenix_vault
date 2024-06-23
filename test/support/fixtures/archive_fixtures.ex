@@ -10,9 +10,7 @@ defmodule PhoenixVault.ArchiveFixtures do
   def snapshot_fixture(attrs \\ %{}) do
     {:ok, snapshot} =
       attrs
-      |> Enum.into(%{
-
-      })
+      |> Enum.into(%{})
       |> PhoenixVault.Archive.create_snapshot()
 
     snapshot

@@ -12,11 +12,11 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
   @impl true
   def render(assigns) do
     Logger.debug("assigns: #{inspect(assigns, pretty: true)}")
-    
+
     tag_names = tag_list_to_string(assigns[:snapshot].tags)
-    
+
     Logger.debug("tag_names: #{tag_names}")
-    
+
     ~H"""
     <div>
       <.header>
@@ -33,7 +33,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
       >
         <.input field={@form[:title]} label="Title" type="text" required />
         <.input field={@form[:url]} label="URL" type="text" required />
-        <.input field={@form[:tags]} label="Tags" type="text" value={tag_names}/>
+        <.input field={@form[:tags]} label="Tags" type="text" value={tag_names} />
 
         <:actions>
           <.button phx-disable-with="Saving...">Save Snapshot</.button>

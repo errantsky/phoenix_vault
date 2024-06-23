@@ -63,7 +63,7 @@ defmodule PhoenixVault.Archive do
 
     {:ok, snapshot} = Repo.insert(%Snapshot{url: attrs["url"], title: attrs["title"], tags: tags})
     ArchiverSupervisor.start_link(snapshot)
-    
+
     {:ok, snapshot}
   end
 

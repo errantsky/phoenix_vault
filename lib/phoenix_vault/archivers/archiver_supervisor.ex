@@ -14,10 +14,10 @@ defmodule PhoenixVault.Archivers.ArchiverSupervisor do
   @impl true
   def init(snapshot) do
     Logger.debug("Reached supervisor")
-    
+
     # create per snapshot directory
     File.mkdir_p!(ArchiverConfig.snapshot_dir(snapshot))
-    
+
     Logger.debug("Reached mkdir: #{inspect(ArchiverConfig.snapshot_dir(snapshot))}")
 
     children = [

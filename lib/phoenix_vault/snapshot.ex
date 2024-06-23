@@ -6,8 +6,10 @@ defmodule PhoenixVault.Snapshot do
   schema "snapshots" do
     field :title, :string
     field :url, :string
-    
-    many_to_many :tags, PhoenixVault.Tag, join_through: PhoenixVault.SnapshotTag, on_replace: :delete
+
+    many_to_many :tags, PhoenixVault.Tag,
+      join_through: PhoenixVault.SnapshotTag,
+      on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end

@@ -4,7 +4,7 @@ defmodule PhoenixVault.Tag do
 
   schema "tags" do
     field :name, :string
-    
+
     many_to_many :snapshots, PhoenixVault.Snapshot, join_through: "snapshot_tags"
 
     timestamps(type: :utc_datetime)

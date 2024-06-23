@@ -10,7 +10,7 @@ defmodule PhoenixVault.Archivers.HtmlArchiver do
   @impl true
   def init(snapshot) do
     Task.start_link(fn -> archive_as_html(snapshot) end)
-    
+
     {:ok, snapshot}
   end
 
