@@ -6,10 +6,10 @@ defmodule PhoenixVault.Archive do
   import Ecto.Query, warn: false
   require Logger
   alias PhoenixVault.Archivers.ArchiverSupervisor
-  alias PhoenixVault.Tag
+  alias PhoenixVault.Schemas.Tag
   alias PhoenixVault.Repo
 
-  alias PhoenixVault.Snapshot
+  alias PhoenixVault.Schemas.Snapshot
 
   @doc """
   Returns the list of snapshots.

@@ -1,5 +1,5 @@
 defmodule PhoenixVault.Archivers.PdfArchiver do
-  alias PhoenixVault.Snapshot
+  alias PhoenixVault.Schemas.Snapshot
   alias PhoenixVault.Archivers.ArchiverConfig
   use GenServer
 

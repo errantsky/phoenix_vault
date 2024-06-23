@@ -2,7 +2,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   use PhoenixVaultWeb, :live_view
 
   alias PhoenixVault.Archive
-  alias PhoenixVault.Snapshot
+  alias PhoenixVault.Schemas.Snapshot
 
   @impl true
   def mount(_params, _session, socket) do

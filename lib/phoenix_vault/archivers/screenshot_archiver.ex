@@ -1,7 +1,7 @@
 defmodule PhoenixVault.Archivers.ScreenshotArchiver do
   require Logger
   alias PhoenixVault.Archivers.ArchiverConfig
-  alias PhoenixVault.Snapshot
+  alias PhoenixVault.Schemas.Snapshot
   use GenServer
 
   def start_link(snapshot) do

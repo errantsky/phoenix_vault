@@ -1,11 +1,11 @@
-defmodule PhoenixVault.Tag do
+defmodule PhoenixVault.Schemas.Tag do
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "tags" do
     field :name, :string
 
-    many_to_many :snapshots, PhoenixVault.Snapshot, join_through: "snapshot_tags"
+    many_to_many :snapshots, PhoenixVault.Schemas.Snapshot, join_through: "snapshot_tags"
 
     timestamps(type: :utc_datetime)
   end

@@ -1,11 +1,11 @@
-defmodule PhoenixVault.SnapshotTag do
+defmodule PhoenixVault.Schemas.SnapshotTag do
   use Ecto.Schema
   import Ecto.Changeset
 
   @primary_key false
   schema "snapshot_tags" do
-    belongs_to :snapshot, PhoenixVault.Snapshot
-    belongs_to :tag, PhoenixVault.Tag
+    belongs_to :snapshot, PhoenixVault.Schemas.Snapshot
+    belongs_to :tag, PhoenixVault.Schemas.Tag
 
     timestamps(type: :utc_datetime)
   end

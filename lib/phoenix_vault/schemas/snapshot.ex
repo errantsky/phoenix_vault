@@ -1,4 +1,4 @@
-defmodule PhoenixVault.Snapshot do
+defmodule PhoenixVault.Schemas.Snapshot do
   require Logger
   use Ecto.Schema
   import Ecto.Changeset
@@ -7,8 +7,8 @@ defmodule PhoenixVault.Snapshot do
     field :title, :string
     field :url, :string
 
-    many_to_many :tags, PhoenixVault.Tag,
-      join_through: PhoenixVault.SnapshotTag,
+    many_to_many :tags, PhoenixVault.Schemas.Tag,
+      join_through: PhoenixVault.Schemas.SnapshotTag,
       on_replace: :delete
 
     timestamps(type: :utc_datetime)
