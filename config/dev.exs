@@ -62,6 +62,8 @@ config :phoenix_vault, PhoenixVaultWeb.Endpoint,
     ]
   ]
 
+config :phoenix_vault, ChromicPDF, on_demand: true
+
 # Enable dev routes for dashboard and mailbox
 config :phoenix_vault, dev_routes: true
 

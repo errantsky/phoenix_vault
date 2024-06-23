@@ -31,6 +31,8 @@ config :phoenix_vault, PhoenixVaultWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :phoenix_vault, PhoenixVault.Mailer, adapter: Swoosh.Adapters.Local
 
+config :phoenix_vault, ChromicPDF, on_demand: false
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
