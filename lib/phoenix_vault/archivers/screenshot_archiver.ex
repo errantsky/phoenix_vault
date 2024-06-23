@@ -1,4 +1,7 @@
 defmodule PhoenixVault.Archivers.ScreenshotArchiver do
+  require Logger
+  alias PhoenixVault.Archivers.ArchiverConfig
+  alias PhoenixVault.Snapshot
   use GenServer
 
   def start_link(snapshot) do
@@ -8,14 +11,15 @@ defmodule PhoenixVault.Archivers.ScreenshotArchiver do
 
   @impl true
   def init(snapshot) do
+    Logger.debug("Reached save_screenshot")
     Task.start_link(fn -> save_screenshot(snapshot) end)
 
     {:ok, snapshot}
   end
 
-  defp save_screenshot(%{id: id, url: url}) do
-    ChromicPDF.capture_screenshot({:url, url},
-      output: Path.join("priv/archive", "#{id}.png"),
+  defp save_screenshot(%Snapshot{} = snapshot) do
+    ChromicPDF.capture_screenshot({:url, snapshot.url},
+      output: Path.join(ArchiverConfig.snapshot_dir(snapshot), "#{snapshot.id}.png"),
       full_page: true
     )
   end

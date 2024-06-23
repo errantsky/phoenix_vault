@@ -1,4 +1,6 @@
 defmodule PhoenixVault.Archivers.PdfArchiver do
+  alias PhoenixVault.Snapshot
+  alias PhoenixVault.Archivers.ArchiverConfig
   use GenServer
 
   def start_link(snapshot) do
@@ -13,9 +15,9 @@ defmodule PhoenixVault.Archivers.PdfArchiver do
     {:ok, snapshot}
   end
 
-  defp print_pdf_for_url(%{url: url, id: id}) do
-    ChromicPDF.print_to_pdfa({:url, url},
-      output: Path.join("priv/archive", "#{id}.pdf")
+  defp print_pdf_for_url(%Snapshot{} = snapshot) do
+    ChromicPDF.print_to_pdfa({:url, snapshot.url},
+      output: Path.join(ArchiverConfig.snapshot_dir(snapshot), "#{snapshot.id}.pdf")
     )
   end
 end
