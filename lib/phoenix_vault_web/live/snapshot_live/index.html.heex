@@ -32,21 +32,21 @@
     <%= if snapshot.is_screenshot_saved do %>
       ✅
     <% else %>
-      ❎
+      ❌
     <% end %>
   </:col>
   <:col :let={{_id, snapshot}} label="PDF Saved">
     <%= if snapshot.is_pdf_saved do %>
       ✅
     <% else %>
-      ❎
+      ❌
     <% end %>
   </:col>
   <:col :let={{_id, snapshot}} label="HTML Saved">
     <%= if snapshot.is_html_saved do %>
       ✅
     <% else %>
-      ❎
+      ❌
     <% end %>
   </:col>
 

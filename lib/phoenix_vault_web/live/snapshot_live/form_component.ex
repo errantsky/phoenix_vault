@@ -33,7 +33,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
       >
         <.input field={@form[:title]} label="Title" type="text" required />
         <.input field={@form[:url]} label="URL" type="text" required />
-        <.input field={@form[:tags]} label="Tags" type="text" />
+        <.input field={@form[:tags]} label="Tags" type="text" value={tag_names} />
         <:actions>
           <.button phx-disable-with="Saving...">Save Snapshot</.button>
         </:actions>
