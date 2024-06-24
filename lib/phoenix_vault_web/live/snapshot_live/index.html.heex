@@ -29,13 +29,25 @@
     <%= snapshot.updated_at %>
   </:col>
   <:col :let={{_id, snapshot}} label="Screenshot Saved">
-    <%= snapshot.is_screenshot_saved %>
+    <%= if snapshot.is_screenshot_saved do %>
+      ✅
+    <% else %>
+      ❎
+    <% end %>
   </:col>
   <:col :let={{_id, snapshot}} label="PDF Saved">
-    <%= snapshot.is_pdf_saved %>
+    <%= if snapshot.is_pdf_saved do %>
+      ✅
+    <% else %>
+      ❎
+    <% end %>
   </:col>
   <:col :let={{_id, snapshot}} label="HTML Saved">
-    <%= snapshot.is_html_saved %>
+    <%= if snapshot.is_html_saved do %>
+      ✅
+    <% else %>
+      ❎
+    <% end %>
   </:col>
 
   <:action :let={{_id, snapshot}}>
