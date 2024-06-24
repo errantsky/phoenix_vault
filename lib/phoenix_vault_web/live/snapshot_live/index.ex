@@ -1,4 +1,5 @@
 defmodule PhoenixVaultWeb.SnapshotLive.Index do
+  require Logger
   use PhoenixVaultWeb, :live_view
 
   alias PhoenixVault.Archive
@@ -6,6 +7,11 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Logger.info("Socket connected, subscribing to snapshots")
+      Phoenix.PubSub.subscribe(PhoenixVault.PubSub, "snapshots")
+    end
+
     {:ok, stream(socket, :snapshots, Archive.list_snapshots())}
   end
 
@@ -34,6 +40,19 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
 
   @impl true
   def handle_info({PhoenixVaultWeb.SnapshotLive.FormComponent, {:saved, snapshot}}, socket) do
+    {:noreply, stream_insert(socket, :snapshots, snapshot)}
+  end
+
+  @impl true
+  def handle_info(
+        %Phoenix.Socket.Broadcast{
+          topic: "snapshots",
+          event: "archiver_update",
+          payload: %{snapshot: snapshot, updated_field: updated_field}
+        },
+        socket
+      ) do
+    Logger.debug("LiveView: Received broadcast for snapshot update: #{inspect(snapshot)}")
     {:noreply, stream_insert(socket, :snapshots, snapshot)}
   end
 

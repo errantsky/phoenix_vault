@@ -6,9 +6,9 @@ defmodule PhoenixVault.Schemas.Snapshot do
   schema "snapshots" do
     field :title, :string
     field :url, :string
-    field :is_html_saved, :boolean
-    field :is_screenshot_saved, :boolean
-    field :is_pdf_saved, :boolean
+    field :is_html_saved, :boolean, default: false
+    field :is_screenshot_saved, :boolean, default: false
+    field :is_pdf_saved, :boolean, default: false
 
     many_to_many :tags, PhoenixVault.Schemas.Tag,
       join_through: PhoenixVault.Schemas.SnapshotTag,

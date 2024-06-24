@@ -81,14 +81,21 @@ defmodule PhoenixVault.Archive do
   """
   def update_snapshot(%Snapshot{} = snapshot, attrs) do
     tag_structs =
-      Map.get(attrs, "tags")
-      |> String.split(",")
-      |> Enum.map(&String.trim/1)
-      |> Enum.map(fn name -> %Tag{name: name} end)
+      case Map.get(attrs, "tags") do
+        nil ->
+          snapshot.tags
 
-    Logger.debug("tag_structs is: #{inspect(tag_structs)}")
+        tags ->
+          tags
+          |> String.split(",")
+          |> Enum.map(&String.trim/1)
+          |> Enum.map(fn name -> %Tag{name: name} end)
+      end
 
+    # Ensure all keys in attrs are strings
+    attrs = attrs |> Enum.into(%{}, fn {key, value} -> {to_string(key), value} end)
     attrs = Map.put(attrs, "tags", tag_structs)
+
     Logger.debug("attrs is: #{inspect(attrs)}")
 
     snapshot = Repo.preload(snapshot, :tags)
@@ -107,6 +114,25 @@ defmodule PhoenixVault.Archive do
     end
   end
 
+  def update_archiver_status(%Snapshot{} = snapshot, attrs) do
+    Logger.debug("update_archiver_status: attrs is: #{inspect(attrs)}")
+
+    snapshot = Repo.preload(snapshot, :tags)
+    changeset = Snapshot.changeset(snapshot, attrs)
+
+    Logger.debug("update_archiver_status: changeset is: #{inspect(changeset)}")
+
+    case Repo.update(changeset) do
+      {:ok, updated_snapshot} ->
+        Logger.debug("update_archiver_status: updated_snapshot is: #{inspect(updated_snapshot)}")
+        {:ok, updated_snapshot}
+
+      {:error, changeset} ->
+        Logger.debug("update_archiver_status: error is: #{inspect(changeset)}")
+        {:error, changeset}
+    end
+  end
+  
   @doc """
   Deletes a Snapshot.
 
