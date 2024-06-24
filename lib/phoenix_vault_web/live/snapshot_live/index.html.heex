@@ -28,6 +28,15 @@
   <:col :let={{_id, snapshot}} label="Updated at">
     <%= snapshot.updated_at %>
   </:col>
+  <:col :let={{_id, snapshot}} label="Screenshot Saved">
+    <%= snapshot.is_screenshot_saved %>
+  </:col>
+  <:col :let={{_id, snapshot}} label="PDF Saved">
+    <%= snapshot.is_pdf_saved %>
+  </:col>
+  <:col :let={{_id, snapshot}} label="HTML Saved">
+    <%= snapshot.is_html_saved %>
+  </:col>
 
   <:action :let={{_id, snapshot}}>
     <div class="sr-only">
