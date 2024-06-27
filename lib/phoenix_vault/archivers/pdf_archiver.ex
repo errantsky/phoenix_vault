@@ -15,28 +15,17 @@ defmodule PhoenixVault.Archivers.PdfArchiver do
   def init(snapshot) do
     Logger.debug("PdfArchiver: Starting for snapshot #{snapshot.id}")
 
+    # todo add error handling
     Task.start_link(fn ->
       Logger.debug("PdfArchiver: Creating PDF for snapshot #{snapshot.id}")
       print_pdf_for_url(snapshot)
 
       Logger.debug("PdfArchiver: Finished creating the PDF for snapshot #{snapshot.id}")
 
-      case Archive.update_snapshot(snapshot, %{is_pdf_saved: true}) do
-        {:ok, updated_snapshot} ->
-          Logger.debug(
-            "PdfArchiver: Snapshot updated successfully, broadcasting update for snapshot #{updated_snapshot.id}"
-          )
-
-          PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
-            snapshot: updated_snapshot,
-            updated_field: "is_pdf_saved"
-          })
-
-        {:error, %Ecto.Changeset{} = changeset} ->
-          Logger.error(
-            "PdfArchiver: Failed to update the snapshot #{snapshot.id}: #{inspect(changeset)}"
-          )
-      end
+      PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
+        snapshot_id: snapshot.id,
+        updated_column: :is_pdf_saved
+      })
     end)
 
     {:ok, snapshot}

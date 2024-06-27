@@ -19,22 +19,10 @@ defmodule PhoenixVault.Archivers.HtmlArchiver do
 
       Logger.debug("HtmlArchiver: Finished creating the HTML for snapshot #{snapshot.id}")
 
-      case Archive.update_snapshot(snapshot, %{is_html_saved: true}) do
-        {:ok, updated_snapshot} ->
-          Logger.debug(
-            "HtmlArchiver: Snapshot updated successfully, broadcasting update for snapshot #{updated_snapshot.id}"
-          )
-
-          PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
-            snapshot: updated_snapshot,
-            updated_field: "is_html_saved"
-          })
-
-        {:error, %Ecto.Changeset{} = changeset} ->
-          Logger.error(
-            "HtmlArchiver: Failed to update the snapshot #{snapshot.id}: #{inspect(changeset)}"
-          )
-      end
+      PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
+        snapshot_id: snapshot.id,
+        updated_column: :is_html_saved
+      })
     end)
 
     {:ok, snapshot}

@@ -48,12 +48,27 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
         %Phoenix.Socket.Broadcast{
           topic: "snapshots",
           event: "archiver_update",
-          payload: %{snapshot: snapshot, updated_field: updated_field}
+          payload: %{snapshot_id: snapshot_id, updated_column: updated_column}
         },
         socket
       ) do
-    Logger.debug("LiveView: Received broadcast for snapshot update: #{inspect(snapshot)}")
-    {:noreply, stream_insert(socket, :snapshots, snapshot)}
+    snapshot = Archive.get_snapshot!(snapshot_id)
+
+    case Archive.update_snapshot(snapshot, %{updated_column => true}) do
+      {:ok, updated_snapshot} ->
+        Logger.debug(
+          "index handle_info archiver_update snapshot: #{inspect(updated_snapshot, pretty: true)}"
+        )
+
+        {:noreply, stream_insert(socket, :snapshots, updated_snapshot)}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        Logger.error(
+          "Index handle_info: Failed to update the snapshot #{snapshot.id}: #{inspect(changeset)}"
+        )
+
+        {:noreply, socket}
+    end
   end
 
   @impl true
