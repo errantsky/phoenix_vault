@@ -6,13 +6,16 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   alias PhoenixVault.Schemas.Snapshot
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     if connected?(socket) do
       Logger.info("Socket connected, subscribing to snapshots")
       Phoenix.PubSub.subscribe(PhoenixVault.PubSub, "snapshots")
     end
+    
+    Logger.debug("Index mount socket: #{inspect(socket, pretty: true)}")
+    Logger.debug("Index mount session: #{inspect(session, pretty: true)}")
 
-    {:ok, stream(socket, :snapshots, Archive.list_snapshots())}
+    {:ok, stream(socket, :snapshots, Archive.list_snapshots(socket.assigns[:current_user]))}
   end
 
   @impl true
@@ -23,7 +26,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Snapshot")
-    |> assign(:snapshot, Archive.get_snapshot!(id))
+    |> assign(:snapshot, Archive.get_snapshot!(id, socket.assigns.current_user))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -61,7 +64,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
       "index handle_info archiver_update fetching snapshot #{snapshot_id} to update #{updated_column}"
     )
 
-    snapshot = Archive.get_snapshot!(snapshot_id)
+    snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns.current_user)
 
     case Archive.update_snapshot(snapshot, %{updated_column => true}) do
       {:ok, updated_snapshot} ->
@@ -82,7 +85,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    snapshot = Archive.get_snapshot!(id)
+    snapshot = Archive.get_snapshot!(id, socket.assigns.current_user)
     {:ok, _} = Archive.delete_snapshot(snapshot)
 
     {:noreply, stream_delete(socket, :snapshots, snapshot)}

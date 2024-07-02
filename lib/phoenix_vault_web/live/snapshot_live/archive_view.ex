@@ -14,7 +14,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.ArchiveView do
       :noreply,
       socket
       |> assign(:page_title, "Archive View")
-      |> assign(:snapshot, Archive.get_snapshot!(id))
+      |> assign(:snapshot, Archive.get_snapshot!(id, socket.assigns.current_user))
     }
   end
 end

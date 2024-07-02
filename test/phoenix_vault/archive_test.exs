@@ -4,7 +4,7 @@ defmodule PhoenixVault.ArchiveTest do
   alias PhoenixVault.Archive
 
   describe "snapshots" do
-    alias PhoenixVault.Archive.Snapshot
+    alias PhoenixVault.Schemas.Snapshot
 
     import PhoenixVault.ArchiveFixtures
 

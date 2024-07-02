@@ -22,14 +22,17 @@ defmodule PhoenixVaultWeb.Router do
 
     # get "/", PageController, :home
     # live "/", SnapshotsLive, :list_snapshots
-    live "/snapshots", SnapshotLive.Index, :index
-    live "/snapshots/new", SnapshotLive.Index, :new
-    live "/snapshots/:id/edit", SnapshotLive.Index, :edit
+    live_session(:authenticated, on_mount: [{PhoenixVaultWeb.UserAuth, :ensure_authenticated}]) do
+      live "/", SnapshotLive.Index, :index
+      live "/snapshots", SnapshotLive.Index, :index
+      live "/snapshots/new", SnapshotLive.Index, :new
+      live "/snapshots/:id/edit", SnapshotLive.Index, :edit
 
-    live "/snapshots/:id", SnapshotLive.Show, :show
-    live "/snapshots/:id/show/edit", SnapshotLive.Show, :edit
-    
-    live "/snapshots/:id/archive_view", SnapshotLive.ArchiveView, :view
+      live "/snapshots/:id", SnapshotLive.Show, :show
+      live "/snapshots/:id/show/edit", SnapshotLive.Show, :edit
+
+      live "/snapshots/:id/archive_view", SnapshotLive.ArchiveView, :view
+    end
   end
 
   # Other scopes may use custom stacks.

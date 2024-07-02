@@ -11,7 +11,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
 
   @impl true
   def render(assigns) do
-    Logger.debug("assigns: #{inspect(assigns, pretty: true)}")
+    Logger.debug("FormComponent assigns: #{inspect(assigns, pretty: true)}")
 
     tag_names = tag_list_to_string(assigns[:snapshot].tags)
 
@@ -82,7 +82,8 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
   end
 
   defp save_snapshot(socket, :new, snapshot_params) do
-    case Archive.create_snapshot(snapshot_params) do
+    Logger.debug("save_snapshot current_user: #{inspect(socket.assigns, pretty: true)}")
+    case Archive.create_snapshot(snapshot_params, socket.assigns[:current_user]) do
       {:ok, snapshot} ->
         notify_parent({:saved, snapshot})
 
@@ -91,12 +92,14 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
          |> put_flash(:info, "Snapshot created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
+      {:error, changeset} ->
+        Logger.debug("save_snapshot error: #{inspect(changeset, pretty: true)}")
         {:noreply, assign_form(socket, changeset)}
     end
   end
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
+    Logger.debug("assign_form socket info: #{inspect(socket, pretty: true)}")
     assign(socket, :form, to_form(changeset))
   end
 

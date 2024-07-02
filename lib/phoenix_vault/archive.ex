@@ -21,8 +21,14 @@ defmodule PhoenixVault.Archive do
       [%Snapshot{}, ...]
 
   """
-  def list_snapshots do
-    Repo.all(Snapshot)
+  def list_snapshots(current_user) do
+    Logger.debug("list_snapshots: current_user is #{inspect(current_user, pretty: true)}")
+
+    query =
+      from snapshot in Snapshot,
+        where: snapshot.user_id == ^current_user.id
+
+    Repo.all(query)
     |> Repo.preload(:tags)
   end
 
@@ -37,8 +43,12 @@ defmodule PhoenixVault.Archive do
       %Snapshot{}
 
   """
-  def get_snapshot!(id) do
-    Repo.get(Snapshot, id)
+  def get_snapshot!(id, current_user) do
+    if current_user == nil do
+      Repo.get_by(Snapshot, id: id)
+    else
+      Repo.get_by(Snapshot, id: id, user_id: current_user.id)
+    end
     |> Repo.preload(:tags)
   end
 
@@ -54,15 +64,29 @@ defmodule PhoenixVault.Archive do
       {:error, ...}
 
   """
-  def create_snapshot(attrs \\ %{}) do
+  def create_snapshot(attrs \\ %{}, current_user) do
     tags =
-      String.split(attrs["tags"], ",")
-      |> Enum.map(&String.trim/1)
-      |> Enum.map(fn name -> %Tag{name: name} end)
+      case attrs["tags"] do
+        nil ->
+          []
+
+        _ ->
+          String.split(attrs["tags"], ",")
+          |> Enum.map(&String.trim/1)
+          |> Enum.map(fn name -> %Tag{name: name} end)
+      end
 
     Logger.debug("create_snapshot: #{inspect(attrs)}")
+    Logger.debug("create_snapshot current_user: #{inspect(current_user, pretty: true)}")
 
-    {:ok, snapshot} = Repo.insert(%Snapshot{url: attrs["url"], title: attrs["title"], tags: tags})
+    {:ok, snapshot} =
+      Repo.insert(%Snapshot{
+        url: attrs["url"],
+        title: attrs["title"],
+        user_id: current_user.id,
+        tags: tags
+      })
+
     ArchiverSupervisor.start_link(snapshot)
 
     {:ok, snapshot}

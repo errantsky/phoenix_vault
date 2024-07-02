@@ -7,7 +7,7 @@ defmodule PhoenixVault.ArchiveFixtures do
   @doc """
   Generate a snapshot.
   """
-  def snapshot_fixture(attrs \\ %{}) do
+  def snapshot_fixture(attrs \\ %{title: "test", url: "https://hexdocs.pm/elixir"}) do
     {:ok, snapshot} =
       attrs
       |> Enum.into(%{})
