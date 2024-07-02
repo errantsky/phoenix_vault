@@ -7,16 +7,16 @@
   </:actions>
 </.header>
 
-<.table
-  id="snapshots"
-  rows={@streams.snapshots}
-  row_click={fn {_id, snapshot} -> JS.navigate(~p"/snapshots/#{snapshot}") end}
->
+<.table id="snapshots" rows={@streams.snapshots}>
   <:col :let={{_id, snapshot}} label="Title">
-    <%= snapshot.title %>
+    <.link navigate={~p"/snapshots/#{snapshot.id}/archive_view"}>
+      <%= snapshot.title %>
+    </.link>
   </:col>
   <:col :let={{_id, snapshot}} label="URL">
-    <%= snapshot.url %>
+    <.link href={snapshot.url} target="_blank" rel="noopener noreferrer">
+      <%= snapshot.url %>
+    </.link>
   </:col>
   <:col :let={{_id, snapshot}} label="Tags">
     <%= Enum.map(snapshot.tags, fn tag -> tag.name end)
