@@ -42,6 +42,11 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   def handle_info({PhoenixVaultWeb.SnapshotLive.FormComponent, {:saved, snapshot}}, socket) do
     {:noreply, stream_insert(socket, :snapshots, snapshot)}
   end
+  
+  @impl true
+  def handle_info(PhoenixVaultWeb.SnapshotLive.BulkSnapshotComponent, {:saved, snapshots}, socket) do
+    {:noreply, stream(socket, :snapshots, snapshots)}
+  end
 
   @impl true
   def handle_info(
@@ -52,19 +57,23 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
         },
         socket
       ) do
+    Logger.debug(
+      "index handle_info archiver_update fetching snapshot #{snapshot_id} to update #{updated_column}"
+    )
+
     snapshot = Archive.get_snapshot!(snapshot_id)
 
     case Archive.update_snapshot(snapshot, %{updated_column => true}) do
       {:ok, updated_snapshot} ->
         Logger.debug(
-          "index handle_info archiver_update snapshot: #{inspect(updated_snapshot, pretty: true)}"
+          "index handle_info archiver_update updated_snapshot: #{inspect(updated_snapshot, pretty: true)}"
         )
 
         {:noreply, stream_insert(socket, :snapshots, updated_snapshot)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         Logger.error(
-          "Index handle_info: Failed to update the snapshot #{snapshot.id}: #{inspect(changeset)}"
+          "Index handle_info archiver_update: Failed to update the snapshot #{snapshot.id}: #{inspect(changeset)}"
         )
 
         {:noreply, socket}

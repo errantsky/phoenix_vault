@@ -5,6 +5,7 @@ defmodule PhoenixVault.Archive do
 
   import Ecto.Query, warn: false
   require Logger
+  alias Ecto.Changeset
   alias PhoenixVault.Archivers.ArchiverSupervisor
   alias PhoenixVault.Schemas.Tag
   alias PhoenixVault.Repo
@@ -65,6 +66,56 @@ defmodule PhoenixVault.Archive do
     ArchiverSupervisor.start_link(snapshot)
 
     {:ok, snapshot}
+  end
+
+  @doc """
+  Creates multiple snapshots
+
+  ## Example
+
+    iex> bulk_create_snapshots(%{urls: ["https://google.com", "https://kagi.com"]}
+
+  TODO
+  """
+
+  def bulk_create_snapshots(attrs \\ %{}) do
+    # todo add error handling
+    # todo add tags
+    grouped_insert_results =
+      attrs["urls"]
+      |> String.split("\n", trim: true)
+      |> Enum.map(&String.trim/1)
+      |> Enum.map(fn url -> %Snapshot{title: url, url: url} end)
+      |> Enum.map(fn snapshot -> Repo.insert(snapshot) end)
+      |> Enum.group_by(
+        fn insert_result ->
+          case insert_result do
+            {:ok, %Snapshot{}} ->
+              :ok
+
+            {:error, %Changeset{}} ->
+              # todo raise the failed cases, or log store them somewhere
+              :error
+          end
+        end,
+        fn insert_result ->
+          case insert_result do
+            {:ok, snapshot} ->
+              snapshot
+
+            {:error, changeset} ->
+              changeset
+          end
+        end
+      )
+
+    Logger.debug("bulk_create_snapshots result: #{inspect(grouped_insert_results, pretty: true)}")
+
+    if Enum.empty?(grouped_insert_results[:ok]) do
+      {:error, grouped_insert_results}
+    else
+      {:ok, grouped_insert_results}
+    end
   end
 
   @doc """
@@ -132,7 +183,7 @@ defmodule PhoenixVault.Archive do
         {:error, changeset}
     end
   end
-  
+
   @doc """
   Deletes a Snapshot.
 
