@@ -1,6 +1,5 @@
 defmodule PhoenixVault.Archivers.HtmlArchiver do
   require Logger
-  alias PhoenixVault.Archive
   alias PhoenixVault.Schemas.Snapshot
   alias PhoenixVault.Archivers.ArchiverConfig
   use GenServer
