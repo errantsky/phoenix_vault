@@ -60,9 +60,6 @@ defmodule PhoenixVault.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.2"},
       {:chromic_pdf, "~> 1.15"},
-      {:bumblebee, "~> 0.5.3"},
-      {:exla, ">= 0.0.0"},
-      {:ollama, "~> 0.6"}
     ]
   end
 
