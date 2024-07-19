@@ -39,7 +39,7 @@ phoenix_vault-*.tar
 npm-debug.log
 /assets/node_modules/
 
-/priv/archive/
+/archive
 
 .DS_Store
 .env
