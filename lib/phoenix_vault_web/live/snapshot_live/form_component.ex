@@ -81,22 +81,27 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
     end
   end
 
-  defp save_snapshot(socket, :new, snapshot_params) do
+  defp save_snapshot(socket, action, snapshot_params) do
     Logger.debug("save_snapshot current_user: #{inspect(socket.assigns, pretty: true)}")
-    case Archive.create_snapshot(snapshot_params, socket.assigns[:current_user]) do
-      {:ok, snapshot} ->
+    case {action, Archive.create_snapshot(snapshot_params, socket.assigns[:current_user])} do
+      {:new, {:ok, snapshot}} ->
         notify_parent({:saved, snapshot})
-
+  
         {:noreply,
          socket
          |> put_flash(:info, "Snapshot created successfully")
          |> push_patch(to: socket.assigns.patch)}
-
-      {:error, changeset} ->
+  
+      {:new, {:error, changeset}} ->
         Logger.debug("save_snapshot error: #{inspect(changeset, pretty: true)}")
         {:noreply, assign_form(socket, changeset)}
+  
+      {_, _} ->
+        Logger.error("form_component save_snapshot received an unexpected action: #{inspect(action)}")
+        {:noreply, socket}
     end
   end
+
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     Logger.debug("assign_form socket info: #{inspect(socket, pretty: true)}")

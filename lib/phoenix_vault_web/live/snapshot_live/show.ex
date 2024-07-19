@@ -13,7 +13,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:snapshot, Archive.get_snapshot!(id))}
+     |> assign(:snapshot, Archive.get_snapshot!(id, socket.assigns.current_user))}
   end
 
   defp page_title(:show), do: "Show Snapshot"

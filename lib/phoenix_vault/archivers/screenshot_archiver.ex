@@ -1,6 +1,5 @@
 defmodule PhoenixVault.Archivers.ScreenshotArchiver do
   require Logger
-  alias PhoenixVault.Archive
   alias PhoenixVault.Archivers.ArchiverConfig
   alias PhoenixVault.Schemas.Snapshot
   use GenServer

@@ -2,7 +2,6 @@ defmodule PhoenixVaultWeb.SnapshotLive.BulkSnapshotComponent do
   use PhoenixVaultWeb, :live_component
 
   alias PhoenixVault.Archive
-  alias PhoenixVault.Schemas.Snapshot
 
   require Logger
 
@@ -50,6 +49,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.BulkSnapshotComponent do
   #   {:noreply, assign_form(socket, changeset)}
   # end
 
+  @impl true
   def handle_event("bulk_save", %{"urls" => urls}, socket) do
     save_snapshot(socket, socket.assigns.action, urls)
   end

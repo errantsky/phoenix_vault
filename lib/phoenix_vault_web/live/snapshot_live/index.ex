@@ -11,7 +11,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
       Logger.info("Socket connected, subscribing to snapshots")
       Phoenix.PubSub.subscribe(PhoenixVault.PubSub, "snapshots")
     end
-    
+
     Logger.debug("Index mount socket: #{inspect(socket, pretty: true)}")
     Logger.debug("Index mount session: #{inspect(session, pretty: true)}")
 
@@ -45,13 +45,14 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   def handle_info({PhoenixVaultWeb.SnapshotLive.FormComponent, {:saved, snapshot}}, socket) do
     {:noreply, stream_insert(socket, :snapshots, snapshot)}
   end
-  
-  @impl true
-  def handle_info(PhoenixVaultWeb.SnapshotLive.BulkSnapshotComponent, {:saved, snapshots}, socket) do
+
+  def handle_info(
+        {PhoenixVaultWeb.SnapshotLive.BulkSnapshotComponent, {:saved, snapshots}},
+        socket
+      ) do
     {:noreply, stream(socket, :snapshots, snapshots)}
   end
 
-  @impl true
   def handle_info(
         %Phoenix.Socket.Broadcast{
           topic: "snapshots",

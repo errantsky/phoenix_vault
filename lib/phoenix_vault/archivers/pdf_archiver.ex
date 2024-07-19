@@ -1,7 +1,5 @@
 defmodule PhoenixVault.Archivers.PdfArchiver do
   require Logger
-  alias PhoenixVaultWeb.SnapshotLive
-  alias PhoenixVault.Archive
   alias PhoenixVault.Schemas.Snapshot
   alias PhoenixVault.Archivers.ArchiverConfig
   use GenServer
