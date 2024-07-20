@@ -61,6 +61,7 @@ defmodule PhoenixVault.MixProject do
       {:bandit, "~> 1.2"},
       {:chromic_pdf, "~> 1.15"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false}
     ]
   end
 
