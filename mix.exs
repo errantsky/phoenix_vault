@@ -60,6 +60,7 @@ defmodule PhoenixVault.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.2"},
       {:chromic_pdf, "~> 1.15"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
     ]
   end
 

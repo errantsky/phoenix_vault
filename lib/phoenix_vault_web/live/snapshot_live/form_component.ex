@@ -6,7 +6,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
   require Logger
 
   defp tag_list_to_string(tags) when is_list(tags) do
-    Enum.map(tags, fn tag -> tag.name end) |> Enum.join(",")
+    Enum.map_join(tags, ",", fn tag -> tag.name end)
   end
 
   @impl true
