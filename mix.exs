@@ -64,6 +64,7 @@ defmodule PhoenixVault.MixProject do
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       # AI deps
       {:tiktoken, "~> 0.3"},
+      {:pgvector, "~> 0.3.0"}
     ]
   end
 

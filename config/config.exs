@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :phoenix_vault, PhoenixVault.Repo, types: PhoenixVault.PostgrexTypes
+
 config :phoenix_vault,
   ecto_repos: [PhoenixVault.Repo],
   generators: [timestamp_type: :utc_datetime]
