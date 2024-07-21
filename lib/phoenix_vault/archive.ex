@@ -78,7 +78,7 @@ defmodule PhoenixVault.Archive do
 
     Logger.debug("create_snapshot: #{inspect(attrs)}")
     Logger.debug("create_snapshot current_user: #{inspect(current_user, pretty: true)}")
-
+    
     {:ok, snapshot} =
       Repo.insert(%Snapshot{
         url: attrs["url"],

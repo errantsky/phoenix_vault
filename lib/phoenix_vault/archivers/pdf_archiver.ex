@@ -22,7 +22,7 @@ defmodule PhoenixVault.Archivers.PdfArchiver do
 
       PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
         snapshot_id: snapshot.id,
-        updated_column: :is_pdf_saved
+        updated_columns: %{is_pdf_saved: true}
       })
     end)
 

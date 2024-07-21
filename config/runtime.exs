@@ -16,12 +16,24 @@ import Config
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
-config :phoenix_vault, :archive_dir, System.get_env("ARCHIVE_DIR")
-config :phoenix_vault, :openai_api_key, System.get_env("OPENAI_API_KEY")
-
 if System.get_env("PHX_SERVER") do
   config :phoenix_vault, PhoenixVaultWeb.Endpoint, server: true
 end
+
+config :phoenix_vault,
+       :archive_dir,
+       System.get_env("ARCHIVE_DIR") ||
+         raise("""
+         environment variable ARCHIVE_DIR is missing.
+         """)
+
+config :phoenix_vault,
+       :openai_api_key,
+       System.get_env("OPENAI_API_KEY") ||
+         raise("""
+         environment variable OPENAI_API_KEY is missing.
+         """)
+
 
 if config_env() == :prod do
   database_url =

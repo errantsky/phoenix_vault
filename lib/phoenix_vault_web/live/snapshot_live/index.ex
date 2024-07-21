@@ -57,17 +57,17 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
         %Phoenix.Socket.Broadcast{
           topic: "snapshots",
           event: "archiver_update",
-          payload: %{snapshot_id: snapshot_id, updated_column: updated_column}
+          payload: %{snapshot_id: snapshot_id, updated_columns: updated_columns}
         },
         socket
       ) do
     Logger.debug(
-      "index handle_info archiver_update fetching snapshot #{snapshot_id} to update #{updated_column}"
+      "index handle_info archiver_update fetching snapshot #{snapshot_id} to update #{updated_columns}"
     )
 
     snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns.current_user)
 
-    case Archive.update_snapshot(snapshot, %{updated_column => true}) do
+    case Archive.update_snapshot(snapshot, updated_columns) do
       {:ok, updated_snapshot} ->
         Logger.debug(
           "index handle_info archiver_update updated_snapshot: #{inspect(updated_snapshot, pretty: true)}"

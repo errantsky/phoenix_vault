@@ -22,7 +22,7 @@ defmodule PhoenixVault.Archivers.ScreenshotArchiver do
 
       PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
         snapshot_id: snapshot.id,
-        updated_column: :is_screenshot_saved
+        updated_columns: %{is_screenshot_saved: true}
       })
     end)
 
