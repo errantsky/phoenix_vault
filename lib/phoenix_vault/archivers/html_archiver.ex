@@ -36,7 +36,8 @@ defmodule PhoenixVault.Archivers.HtmlArchiver do
     archive_command =
       "wget --convert-links --adjust-extension --page-requisites #{snapshot.url} -P #{ArchiverConfig.snapshot_dir(snapshot)}"
 
-    {_, 0} = System.cmd("sh", ["-c", archive_command])
+      # TODO 0 and other vals
+      {_, exit_status} = System.cmd("sh", ["-c", archive_command])
 
     snapshot_dir = ArchiverConfig.snapshot_dir(snapshot)
     index_html_path = find_index_html(snapshot_dir)
