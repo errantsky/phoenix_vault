@@ -23,5 +23,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dockerfile for fly.io
 
 
-[unreleased]: 
+[unreleased]: https://github.com/errantsky/phoenix_vault/compare/v0.1.0...HEAD
 [0.0.1]: https://github.com/errantsky/phoenix_vault/releases/tag/0.1.0
