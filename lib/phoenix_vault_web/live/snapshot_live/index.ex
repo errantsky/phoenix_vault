@@ -62,7 +62,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
         socket
       ) do
     Logger.debug(
-      "index handle_info archiver_update fetching snapshot #{snapshot_id} to update #{updated_columns}"
+      "index handle_info archiver_update fetching snapshot #{snapshot_id} to update #{inspect(updated_columns)}"
     )
 
     snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns.current_user)

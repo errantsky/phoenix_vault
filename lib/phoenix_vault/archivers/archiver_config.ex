@@ -7,11 +7,7 @@ defmodule PhoenixVault.Archivers.ArchiverConfig do
   alias PhoenixVault.Schemas.Snapshot
 
   def snapshot_dir(%Snapshot{id: id}) do
-    archive_dir = Application.get_env(:phoenix_vault, :archive_dir)
-    unless archive_dir do
-      raise "Archive directory not configured in :phoenix_vault application"
-    end
-    path = Path.expand(archive_dir, Integer.to_string(id))
+    path = Path.expand(Integer.to_string(id), Application.get_env(:phoenix_vault, :archive_dir))
     Logger.debug("snapshot_dir is: #{path}")
     path
   end
