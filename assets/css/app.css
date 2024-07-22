@@ -3,20 +3,3 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
-.search-form {
-  display: flex;
-  align-items: center;
-}
-
-.reset-button {
-  margin-left: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.2em;
-  color: #888;
-}
-
-.reset-button:hover {
-  color: #333;
-}

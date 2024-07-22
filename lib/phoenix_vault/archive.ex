@@ -21,19 +21,15 @@ defmodule PhoenixVault.Archive do
       [%Snapshot{}, ...]
 
   """
-  def list_snapshots(current_user, query \\ nil) do
+  def list_snapshots(current_user) do
     Logger.debug("list_snapshots: current_user is #{inspect(current_user, pretty: true)}")
 
-    if query do
-      EmbeddingSearch.find_snapshots_from_query(query, current_user.id, 2)
-    else
-      query =
-        from snapshot in Snapshot,
-          where: snapshot.user_id == ^current_user.id
+    query =
+      from snapshot in Snapshot,
+        where: snapshot.user_id == ^current_user.id
 
-      Repo.all(query)
-      |> Repo.preload(:tags)
-    end
+    Repo.all(query)
+    |> Repo.preload(:tags)
   end
 
   @doc """
