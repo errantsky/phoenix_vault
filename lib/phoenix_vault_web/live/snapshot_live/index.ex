@@ -12,10 +12,13 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
       Phoenix.PubSub.subscribe(PhoenixVault.PubSub, "snapshots")
     end
 
-    Logger.debug("Index mount socket: #{inspect(socket, pretty: true)}")
-    Logger.debug("Index mount session: #{inspect(session, pretty: true)}")
+    search_query = nil
+    snapshots = Archive.list_snapshots(socket.assigns[:current_user], search_query)
 
-    {:ok, stream(socket, :snapshots, Archive.list_snapshots(socket.assigns[:current_user]))}
+    {:ok,
+     socket
+     |> assign(:search_query, search_query)
+     |> stream(:snapshots, snapshots)}
   end
 
   @impl true
@@ -90,5 +93,24 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
     {:ok, _} = Archive.delete_snapshot(snapshot)
 
     {:noreply, stream_delete(socket, :snapshots, snapshot)}
+  end
+
+  @impl true
+  def handle_event("search", %{"query" => query}, socket) do
+    snapshots = Archive.list_snapshots(socket.assigns[:current_user], query)
+    Logger.debug("handle_event search: Fetched #{snapshots |> length()} queries.")
+    {:noreply, assign(socket, :search_query, query) |> stream(:snapshots, snapshots, reset: true)}
+  end
+  
+  @impl true
+  def handle_event("change_query", %{"query" => query}, socket) do
+    {:noreply, assign(socket, :search_query, query)}
+  end
+
+  @impl true
+  def handle_event("reset_search", _params, socket) do
+    snapshots = Archive.list_snapshots(socket.assigns[:current_user], nil)
+    Logger.debug("index handle_event reset search in progress.")
+    {:noreply, assign(socket, :search_query, nil) |> stream(:snapshots, snapshots, reset: true)}
   end
 end

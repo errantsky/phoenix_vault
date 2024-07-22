@@ -24,6 +24,8 @@ defmodule OpenAIClient do
       {"Authorization", "Bearer #{openai_api_key}"}
     ]
     
+    Logger.debug("OpenAIClient get_embedding query: #{text}")
+    
     {:ok, encoded_list} = Tiktoken.CL100K.encode(text) 
     truncated_token_list = Enum.take(encoded_list, @embedding_max_tokens)
     
