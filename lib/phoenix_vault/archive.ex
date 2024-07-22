@@ -78,7 +78,7 @@ defmodule PhoenixVault.Archive do
 
     Logger.debug("create_snapshot: #{inspect(attrs)}")
     Logger.debug("create_snapshot current_user: #{inspect(current_user, pretty: true)}")
-    
+
     {:ok, snapshot} =
       Repo.insert(%Snapshot{
         url: attrs["url"],
@@ -234,14 +234,16 @@ defmodule PhoenixVault.Archive do
 
   """
   def change_snapshot(%Snapshot{} = snapshot, attrs \\ %{}) do
-    # Logger.debug("change_snapshot: #{inspect(attrs)}")
     snapshot = Repo.preload(snapshot, :tags)
-    # if {:ok, tags} = Map.fetch(attrs, "tags") do
-    #   tags = String.split(tags, ",")
-    #   |> Enum.map(&%Tag{name: &1})
-    #   attrs = Map.put(attrs, :tags, tags)
-    # end
-
+    Logger.debug("archive change_snapshot attrs: #{inspect(attrs)}")
+  
+    attrs = 
+      case Map.get(attrs, "tags") do
+        nil -> attrs
+        "" -> Map.delete(attrs, "tags")
+        tags -> Map.put(attrs, "tags", String.split(tags, ",") |> Enum.map(&%Tag{name: &1}))
+      end
+  
     Snapshot.changeset(snapshot, attrs)
   end
 end
