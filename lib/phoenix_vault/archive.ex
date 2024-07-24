@@ -5,6 +5,7 @@ defmodule PhoenixVault.Archive do
 
   import Ecto.Query, warn: false
   require Logger
+  alias Phoenix.LiveView
   alias Ecto.Changeset
   alias PhoenixVault.Archivers.ArchiverSupervisor
   alias PhoenixVault.Schemas.Tag
@@ -13,22 +14,19 @@ defmodule PhoenixVault.Archive do
   alias PhoenixVault.Schemas.Snapshot
 
   @doc """
-  Returns the list of snapshots.
-
-  ## Examples
-
-      iex> list_snapshots()
-      [%Snapshot{}, ...]
-
+  Returns a page's worth of snapshots. Used in the index LiveView's infinite snapshots stream.
   """
-  def list_snapshots(current_user) do
-    Logger.debug("list_snapshots: current_user is #{inspect(current_user, pretty: true)}")
+  def list_snapshots(current_user, offset \\ 0, limit \\ 2)
+      when is_integer(offset) and is_integer(limit) do
+    Logger.debug("paginate_snapshots: started.")
 
-    query =
-      from snapshot in Snapshot,
-        where: snapshot.user_id == ^current_user.id
-
-    Repo.all(query)
+    Repo.all(
+      from s in Snapshot,
+        where: s.user_id == ^current_user.id,
+        order_by: [desc: s.inserted_at],
+        offset: ^offset,
+        limit: ^limit
+    )
     |> Repo.preload(:tags)
   end
 
@@ -236,14 +234,14 @@ defmodule PhoenixVault.Archive do
   def change_snapshot(%Snapshot{} = snapshot, attrs \\ %{}) do
     snapshot = Repo.preload(snapshot, :tags)
     Logger.debug("archive change_snapshot attrs: #{inspect(attrs)}")
-  
-    attrs = 
+
+    attrs =
       case Map.get(attrs, "tags") do
         nil -> attrs
         "" -> Map.delete(attrs, "tags")
         tags -> Map.put(attrs, "tags", String.split(tags, ",") |> Enum.map(&%Tag{name: &1}))
       end
-  
+
     Snapshot.changeset(snapshot, attrs)
   end
 end

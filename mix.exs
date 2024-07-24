@@ -62,6 +62,7 @@ defmodule PhoenixVault.MixProject do
       {:chromic_pdf, "~> 1.15"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
+      {:faker, "~> 0.18.0", only: [:dev, :test]},
       # AI deps
       {:tiktoken, "~> 0.3"},
       {:pgvector, "~> 0.3.0"}

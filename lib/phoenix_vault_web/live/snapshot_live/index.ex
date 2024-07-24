@@ -5,6 +5,9 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   alias PhoenixVault.Archive
   alias PhoenixVault.Schemas.Snapshot
 
+  @overfetch_factor 3
+  @per_page 20
+
   @impl true
   def mount(_params, session, socket) do
     if connected?(socket) do
@@ -15,7 +18,13 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
     Logger.debug("Index mount socket: #{inspect(socket, pretty: true)}")
     Logger.debug("Index mount session: #{inspect(session, pretty: true)}")
 
-    {:ok, stream(socket, :snapshots, Archive.list_snapshots(socket.assigns[:current_user]))}
+    {
+      :ok,
+      socket
+      |> assign(page: 1)
+      |> assign(per_page: @per_page)
+      |> paginate_snapshots(1)
+    }
   end
 
   @impl true
@@ -90,5 +99,51 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
     {:ok, _} = Archive.delete_snapshot(snapshot)
 
     {:noreply, stream_delete(socket, :snapshots, snapshot)}
+  end
+
+  @impl true
+  def handle_event("next-page", _, socket) do
+    Logger.debug("Loading next-page: #{socket.assigns.page} + 1")
+    {:noreply, paginate_snapshots(socket, socket.assigns.page + 1)}
+  end
+
+  @impl true
+  def handle_event("prev-page", %{"_overran" => true}, socket) do
+    Logger.debug("Loading overran prev-page: #{socket.assigns.page}")
+    {:noreply, paginate_snapshots(socket, 1)}
+  end
+
+  @impl true
+  def handle_event("prev-page", _, socket) do
+    Logger.debug("Loading prev-page: #{socket.assigns.page} - 1")
+    if socket.assigns.page > 1 do
+      {:noreply, paginate_snapshots(socket, socket.assigns.page - 1)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  defp paginate_snapshots(socket, new_page) when new_page >= 1 do
+    %{page: cur_page, per_page: per_page, current_user: current_user} = socket.assigns
+
+    snapshots = Archive.list_snapshots(current_user, (new_page - 1) * per_page, per_page)
+
+    {snapshots, at, limit} =
+    if new_page >= cur_page do
+      {snapshots, -1, per_page * @overfetch_factor * -1}
+    else
+      {Enum.reverse(snapshots), 0, per_page * @overfetch_factor}
+    end
+
+    case snapshots do
+    [] ->
+      Logger.debug("paginate_snapshots hit no posts: #{at} #{at == -1}")
+      assign(socket, end_of_timeline?: at == -1)
+    [_ | _] = snapshots ->
+      socket
+      |> assign(:end_of_timeline?, false)
+      |> assign(:page, new_page)
+      |> stream(:snapshots, snapshots, at: at, limit: limit)
+    end
   end
 end

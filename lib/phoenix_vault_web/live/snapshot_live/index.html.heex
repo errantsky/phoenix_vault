@@ -7,7 +7,7 @@
   </:actions>
 </.header>
 
-<.table id="snapshots" rows={@streams.snapshots}>
+<.snapshot_table id="snapshots" rows={@streams.snapshots} page={@page}, end_of_timeline?={@end_of_timeline?}>
   <:col :let={{_id, snapshot}} label="Title">
     <.link navigate={~p"/snapshots/#{snapshot.id}/archive_view"}>
       <%= snapshot.title %>
@@ -67,7 +67,7 @@
       Delete
     </.link>
   </:action>
-</.table>
+</.snapshot_table>
 
 <.modal
   :if={@live_action in [:new, :edit]}
