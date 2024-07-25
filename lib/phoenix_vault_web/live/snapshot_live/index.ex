@@ -6,21 +6,19 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   alias PhoenixVault.Schemas.Snapshot
 
   @overfetch_factor 3
-  @per_page 20
+  @per_page Application.compile_env!(:phoenix_vault, :snapshot_table_per_page)
 
   @impl true
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     if connected?(socket) do
       Logger.info("Socket connected, subscribing to snapshots")
       Phoenix.PubSub.subscribe(PhoenixVault.PubSub, "snapshots")
     end
 
-    Logger.debug("Index mount socket: #{inspect(socket, pretty: true)}")
-    Logger.debug("Index mount session: #{inspect(session, pretty: true)}")
-
     {
       :ok,
       socket
+      |> assign(:search_query, nil)
       |> assign(page: 1)
       |> assign(per_page: @per_page)
       |> paginate_snapshots(1)
@@ -101,6 +99,36 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
     {:noreply, stream_delete(socket, :snapshots, snapshot)}
   end
 
+  def handle_event("search", %{"query" => query}, socket) do
+    snapshots =
+      Archive.list_snapshots(socket.assigns[:current_user],
+        query: query,
+        limit: @per_page,
+        offset: 0
+      )
+
+    Logger.debug("handle_event search: Fetched #{snapshots |> length()} queries.")
+    {:noreply, assign(socket, :search_query, query) |> stream(:snapshots, snapshots, reset: true)}
+  end
+
+  @impl true
+  def handle_event("change_query", %{"query" => query}, socket) do
+    {:noreply, assign(socket, :search_query, query)}
+  end
+
+  @impl true
+  def handle_event("reset_search", _params, socket) do
+    snapshots =
+      Archive.list_snapshots(socket.assigns[:current_user],
+        query: nil,
+        limit: @per_page,
+        offset: 0
+      )
+
+    Logger.debug("index handle_event reset search in progress.")
+    {:noreply, assign(socket, :search_query, nil) |> stream(:snapshots, snapshots, reset: true)}
+  end
+
   @impl true
   def handle_event("next-page", _, socket) do
     Logger.debug("Loading next-page: #{socket.assigns.page} + 1")
@@ -116,6 +144,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   @impl true
   def handle_event("prev-page", _, socket) do
     Logger.debug("Loading prev-page: #{socket.assigns.page} - 1")
+
     if socket.assigns.page > 1 do
       {:noreply, paginate_snapshots(socket, socket.assigns.page - 1)}
     else
@@ -126,24 +155,26 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   defp paginate_snapshots(socket, new_page) when new_page >= 1 do
     %{page: cur_page, per_page: per_page, current_user: current_user} = socket.assigns
 
-    snapshots = Archive.list_snapshots(current_user, (new_page - 1) * per_page, per_page)
+    snapshots =
+      Archive.list_snapshots(current_user, offset: (new_page - 1) * per_page, limit: per_page)
 
     {snapshots, at, limit} =
-    if new_page >= cur_page do
-      {snapshots, -1, per_page * @overfetch_factor * -1}
-    else
-      {Enum.reverse(snapshots), 0, per_page * @overfetch_factor}
-    end
+      if new_page >= cur_page do
+        {snapshots, -1, per_page * @overfetch_factor * -1}
+      else
+        {Enum.reverse(snapshots), 0, per_page * @overfetch_factor}
+      end
 
     case snapshots do
-    [] ->
-      Logger.debug("paginate_snapshots hit no posts: #{at} #{at == -1}")
-      assign(socket, end_of_timeline?: at == -1)
-    [_ | _] = snapshots ->
-      socket
-      |> assign(:end_of_timeline?, false)
-      |> assign(:page, new_page)
-      |> stream(:snapshots, snapshots, at: at, limit: limit)
+      [] ->
+        Logger.debug("paginate_snapshots hit no posts: #{at} #{at == -1}")
+        assign(socket, end_of_timeline?: at == -1)
+
+      [_ | _] = snapshots ->
+        socket
+        |> assign(:end_of_timeline?, false)
+        |> assign(:page, new_page)
+        |> stream(:snapshots, snapshots, at: at, limit: limit)
     end
   end
 end

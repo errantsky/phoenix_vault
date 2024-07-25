@@ -5,21 +5,28 @@ defmodule PhoenixVault.Archive do
 
   import Ecto.Query, warn: false
   require Logger
-  alias Phoenix.LiveView
   alias Ecto.Changeset
   alias PhoenixVault.Archivers.ArchiverSupervisor
   alias PhoenixVault.Schemas.Tag
   alias PhoenixVault.Repo
 
   alias PhoenixVault.Schemas.Snapshot
+  
+  @per_page Application.compile_env!(:phoenix_vault, :snapshot_table_per_page)
 
   @doc """
   Returns a page's worth of snapshots. Used in the index LiveView's infinite snapshots stream.
   """
-  def list_snapshots(current_user, offset \\ 0, limit \\ 2)
-      when is_integer(offset) and is_integer(limit) do
+  def list_snapshots(current_user, opts \\ []) do
+    opts = Keyword.merge([offset: 0, limit: @per_page, query: nil], opts)
+    offset = Keyword.get(opts, :offset)
+    limit = Keyword.get(opts, :limit)
+    query = Keyword.get(opts, :query)
     Logger.debug("paginate_snapshots: started.")
 
+    if query do
+      EmbeddingSearch.find_snapshots_from_query(query, current_user.id, @per_page)
+    else
     Repo.all(
       from s in Snapshot,
         where: s.user_id == ^current_user.id,
@@ -28,6 +35,7 @@ defmodule PhoenixVault.Archive do
         limit: ^limit
     )
     |> Repo.preload(:tags)
+    end
   end
 
   @doc """

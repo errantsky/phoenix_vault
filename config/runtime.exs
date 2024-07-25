@@ -34,7 +34,6 @@ config :phoenix_vault,
          environment variable OPENAI_API_KEY is missing.
          """)
 
-
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

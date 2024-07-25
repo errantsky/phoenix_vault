@@ -7,7 +7,15 @@
   </:actions>
 </.header>
 
-<.snapshot_table id="snapshots" rows={@streams.snapshots} page={@page}, end_of_timeline?={@end_of_timeline?}>
+<form phx-submit="search" phx-change="change_query" class="search-form">
+  <input type="text" name="query" placeholder="Search..." value={@search_query || ""} />
+  <button type="submit">Search</button>
+  <%= if @search_query && @search_query != "" do %>
+    <button type="button" phx-click="reset_search" class="reset-button">✖</button>
+  <% end %>
+</form>
+
+<.snapshot_table id="snapshots" rows={@streams.snapshots} page={@page} end_of_timeline?={@end_of_timeline?}>
   <:col :let={{_id, snapshot}} label="Title">
     <.link navigate={~p"/snapshots/#{snapshot.id}/archive_view"}>
       <%= snapshot.title %>

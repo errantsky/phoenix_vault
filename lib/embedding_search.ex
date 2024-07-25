@@ -13,16 +13,15 @@ defmodule EmbeddingSearch do
         limit: ^limit
     )
   end
-  
-  def find_snapshots_from_query(query_text, user_id, limit \\ 5) do
-    {:ok, query_embedding} = OpenAIClient.get_embedding(query_text)
-    
+
+  def find_snapshots_from_query(snapshot_content, user_id, limit \\ 5) do
+    {:ok, snapshot_embedding} = OpenAIClient.get_embedding(snapshot_content)
+
     Repo.all(
       from s in Snapshot,
         where: s.user_id == ^user_id,
-        select: [s.id, s.title, s.url],
-        order_by: cosine_distance(s.embedding, ^query_embedding),
+        order_by: cosine_distance(s.embedding, ^snapshot_embedding),
         limit: ^limit
-    )
+    ) |> Repo.preload(:tags)
   end
 end

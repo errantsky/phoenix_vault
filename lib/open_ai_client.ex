@@ -24,6 +24,8 @@ defmodule OpenAIClient do
       {"Authorization", "Bearer #{openai_api_key}"}
     ]
     
+    Logger.debug("OpenAIClient get_embedding query: #{text}")
+    
     {:ok, encoded_list} = Tiktoken.CL100K.encode(text) 
     truncated_token_list = Enum.take(encoded_list, @embedding_max_tokens)
     
@@ -39,14 +41,10 @@ defmodule OpenAIClient do
     |> handle_response()
   end
 
-  @doc """
-    
-    The following params are dropped from the API response
-    
-    "model" => "text-embedding-3-small",
-    "object" => "list",
-    "usage" => %{"prompt_tokens" => 1, "total_tokens" => 1}
-    """
+  # The following params are dropped from the API response:
+  # "model" => "text-embedding-3-small",
+  # "object" => "list",
+  # "usage" => %{"prompt_tokens" => 1, "total_tokens" => 1}
   defp handle_response({:ok, %Finch.Response{status: 200, body: body}}) do
     {:ok, Jason.decode!(body) |> get_in(["data", Access.at(0), "embedding"])}
   end
