@@ -50,7 +50,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
 
   @impl true
   def handle_info({PhoenixVaultWeb.SnapshotLive.FormComponent, {:saved, snapshot}}, socket) do
-    {:noreply, stream_insert(socket, :snapshots, snapshot)}
+    {:noreply, stream_insert(socket, :snapshots, snapshot, at: 0, limit: @per_page)}
   end
 
   def handle_info(
@@ -80,7 +80,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
           "index handle_info archiver_update updated_snapshot: #{inspect(updated_snapshot, pretty: true)}"
         )
 
-        {:noreply, stream_insert(socket, :snapshots, updated_snapshot)}
+        {:noreply, stream_insert(socket, :snapshots, updated_snapshot, limit: @per_page)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         Logger.error(
