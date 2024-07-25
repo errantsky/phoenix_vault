@@ -7,8 +7,6 @@
 # General application configuration
 import Config
 
-config :phoenix_vault, :snapshot_table_per_page, 20
-
 config :phoenix_vault, PhoenixVault.Repo, types: PhoenixVault.PostgrexTypes
 
 config :phoenix_vault,

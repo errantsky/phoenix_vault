@@ -12,7 +12,16 @@ defmodule PhoenixVault.Archive do
 
   alias PhoenixVault.Schemas.Snapshot
   
-  @per_page Application.compile_env!(:phoenix_vault, :snapshot_table_per_page)
+  @per_page 20
+  @overfetch_factor 3
+  
+  def snapshot_table_per_page do
+    @per_page
+  end
+  
+  def snapshot_table_overfetch_factor do
+    @overfetch_factor
+  end
 
   @doc """
   Returns a page's worth of snapshots. Used in the index LiveView's infinite snapshots stream.

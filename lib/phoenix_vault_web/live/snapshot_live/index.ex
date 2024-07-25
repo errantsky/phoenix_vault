@@ -4,9 +4,9 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
 
   alias PhoenixVault.Archive
   alias PhoenixVault.Schemas.Snapshot
-
-  @overfetch_factor 3
-  @per_page Application.compile_env!(:phoenix_vault, :snapshot_table_per_page)
+  
+  @per_page Archive.snapshot_table_per_page()
+  @overfetch_factor Archive.snapshot_table_overfetch_factor
 
   @impl true
   def mount(_params, _session, socket) do
