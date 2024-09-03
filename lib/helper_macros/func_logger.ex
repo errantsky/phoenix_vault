@@ -25,7 +25,7 @@ defmodule HelperMacros.FuncLogger do
       result = unquote(call)
       end_time = :os.system_time(:millisecond)
 
-      Logger.debug("log_func #{func_name} Execution time was: #{(end_time - start_time) / 1000} ms")
+      Logger.debug("log_func #{func_name} Execution time was: #{:io_lib.format("~B", [end_time - start_time]) |> IO.iodata_to_binary()} ms")
       Logger.debug("""
         log_func #{func_name} The result was:\n#{inspect(result, pretty: true)}
         """)
