@@ -19,9 +19,9 @@ defmodule PhoenixVault.Archivers.ArchiverSupervisor do
     Logger.debug("Reached supervisor")
 
     # create per snapshot directory
-    File.mkdir_p!(ArchiverConfig.snapshot_dir(snapshot))
+    File.mkdir_p!(ArchiverConfig.snapshot_dir(snapshot.id))
 
-    Logger.debug("Reached mkdir: #{inspect(ArchiverConfig.snapshot_dir(snapshot))}")
+    Logger.debug("Reached mkdir: #{inspect(ArchiverConfig.snapshot_dir(snapshot.id))}")
 
     children = [
       {PdfArchiver, snapshot},

@@ -1,46 +1,42 @@
 defmodule PhoenixVault.Archivers.HtmlArchiver do
+  use Oban.Worker
   require Logger
-  alias PhoenixVault.Schemas.Snapshot
   alias PhoenixVault.Archivers.ArchiverConfig
-  use GenServer
 
-  def start_link(snapshot) do
-    GenServer.start_link(__MODULE__, snapshot,
-      name: {:via, Registry, {PhoenixVault.Archivers.Registry, {:html_archiver, snapshot.id}}}
-    )
+  @impl Worker
+  def perform(%Job{args: %{"snapshot_id" => snapshot_id, "snapshot_url" => snapshot_url}}) do
+    Logger.debug("HtmlArchiver: Starting for snapshot #{snapshot_id}")
+    
+    # todo handle error
+    {:ok, body} = archive_as_html(snapshot_id, snapshot_url)
+    Logger.debug("HtmlArchiver: Finished creating the HTML for snapshot #{snapshot_id}")
+
+    Logger.debug("HtmlArchiver: Creating embedding for snapshot #{snapshot_id}")
+    {:ok, embedding} = OpenAIClient.get_embedding(body)
+    Logger.debug("HtmlArchiver: Finished creating the embedding for snapshot #{snapshot_id}")
+
+    PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
+      snapshot_id: snapshot_id,
+      updated_columns: %{is_html_saved: true, embedding: embedding}
+    })
+
+    {:ok, snapshot_id}
   end
 
-  @impl true
-  def init(snapshot) do
-    Logger.debug("HtmlArchiver: Starting for snapshot #{snapshot.id}")
-
-    Task.start_link(fn ->
-      Logger.debug("HtmlArchiver: Creating HTML for snapshot #{snapshot.id}")
-      # todo handle error
-      {:ok, body} = archive_as_html(snapshot)
-      Logger.debug("HtmlArchiver: Finished creating the HTML for snapshot #{snapshot.id}")
-
-      Logger.debug("HtmlArchiver: Creating embedding for snapshot #{snapshot.id}")
-      {:ok, embedding} = OpenAIClient.get_embedding(body)
-      Logger.debug("HtmlArchiver: Finished creating the embedding for snapshot #{snapshot.id}")
-
-      PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
-        snapshot_id: snapshot.id,
-        updated_columns: %{is_html_saved: true, embedding: embedding}
-      })
-    end)
-
-    {:ok, snapshot}
-  end
-
-  defp archive_as_html(%Snapshot{} = snapshot) do
+  defp archive_as_html(snapshot_id, snapshot_url) do
     archive_command =
-      "wget --convert-links --adjust-extension --page-requisites #{snapshot.url} -P #{ArchiverConfig.snapshot_dir(snapshot)}"
+      "wget --convert-links --adjust-extension --page-requisites #{snapshot_url} -P #{ArchiverConfig.snapshot_dir(snapshot_id)}"
 
-    # TODO 0 and other vals
-    {_, _exit_status} = System.cmd("sh", ["-c", archive_command])
+    Logger.debug("HtmlArchiver: Starting system command to archive HTML")
 
-    snapshot_dir = ArchiverConfig.snapshot_dir(snapshot)
+    {output, exit_status} = System.cmd("sh", ["-c", archive_command])
+
+    Logger.debug(
+      "HtmlArchiver: Finished system command with status #{inspect(exit_status)} and output #{inspect(output)}"
+    )
+
+    # Now continue with the rest of the logic
+    snapshot_dir = ArchiverConfig.snapshot_dir(snapshot_id)
     index_html_path = find_index_html(snapshot_dir)
 
     case index_html_path do

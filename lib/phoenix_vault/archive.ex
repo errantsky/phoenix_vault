@@ -5,20 +5,20 @@ defmodule PhoenixVault.Archive do
 
   import Ecto.Query, warn: false
   require Logger
+  alias PhoenixVault.Archivers
   alias Ecto.Changeset
-  alias PhoenixVault.Archivers.ArchiverSupervisor
   alias PhoenixVault.Schemas.Tag
   alias PhoenixVault.Repo
 
   alias PhoenixVault.Schemas.Snapshot
-  
+
   @per_page 20
   @overfetch_factor 3
-  
+
   def snapshot_table_per_page do
     @per_page
   end
-  
+
   def snapshot_table_overfetch_factor do
     @overfetch_factor
   end
@@ -36,14 +36,14 @@ defmodule PhoenixVault.Archive do
     if query do
       EmbeddingSearch.find_snapshots_from_query(query, current_user.id, @per_page)
     else
-    Repo.all(
-      from s in Snapshot,
-        where: s.user_id == ^current_user.id,
-        order_by: [desc: s.inserted_at],
-        offset: ^offset,
-        limit: ^limit
-    )
-    |> Repo.preload(:tags)
+      Repo.all(
+        from s in Snapshot,
+          where: s.user_id == ^current_user.id,
+          order_by: [desc: s.inserted_at],
+          offset: ^offset,
+          limit: ^limit
+      )
+      |> Repo.preload(:tags)
     end
   end
 
@@ -80,7 +80,7 @@ defmodule PhoenixVault.Archive do
 
   """
   def create_snapshot(attrs \\ %{}, current_user) do
-    # todo add error handling
+    # Process the snapshot creation logic
     tags =
       case attrs["tags"] do
         nil ->
@@ -94,6 +94,7 @@ defmodule PhoenixVault.Archive do
 
     Logger.debug("Archive create_snapshot: #{inspect(attrs)}")
 
+    # Insert the snapshot record into the database
     {:ok, snapshot} =
       Repo.insert(%Snapshot{
         url: attrs["url"],
@@ -101,10 +102,27 @@ defmodule PhoenixVault.Archive do
         user_id: current_user.id,
         tags: tags
       })
-      
-      Logger.debug("Archive create_snapshot snapshot: #{inspect(snapshot, pretty: true)}")
-      ArchiverSupervisor.start_link(snapshot)
 
+    Logger.debug("Archive create_snapshot: starting queueing the archiver jobs with Oban")
+
+    Ecto.Multi.new()
+    |> Oban.insert(
+      "pdf-archiver-#{snapshot.id}",
+      Archivers.PdfArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
+    )
+    |> Oban.insert(
+      "html-archiver-#{snapshot.id}",
+      Archivers.HtmlArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
+    )
+    |> Oban.insert(
+      "screenshot-archiver-#{snapshot.id}",
+      Archivers.ScreenshotArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
+    )
+    |> PhoenixVault.Repo.transaction()
+    
+    Logger.debug("Archive create_snapshot: finished queueing the archiver jobs with Oban")
+    
+    # Return the created snapshot, immediately responding to the API request
     {:ok, snapshot}
   end
 

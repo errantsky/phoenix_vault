@@ -1,11 +1,9 @@
 defmodule PhoenixVaultWeb.SnapshotController do
-  require Logger
   use PhoenixVaultWeb, :controller
+  require Logger
 
   alias PhoenixVault.Accounts.User
   alias PhoenixVault.Archive
-  alias PhoenixVault.Schemas.{Snapshot, Tag}
-  alias PhoenixVault.Archivers.ArchiverSupervisor
   alias PhoenixVault.Repo
 
   # todo: fetch the current_user
@@ -22,10 +20,9 @@ defmodule PhoenixVaultWeb.SnapshotController do
         |> json(%{status: "successful", data: snapshot})
 
       {:error, changeset} ->
-      conn
-      |> put_status(:unprocessable_entity)
-      |> json(%{status: "error", errors: changeset.errors})
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{status: "error", errors: changeset.errors})
     end
   end
 end
-

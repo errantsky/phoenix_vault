@@ -1,38 +1,28 @@
 defmodule PhoenixVault.Archivers.PdfArchiver do
+  use Oban.Worker
   require Logger
-  alias PhoenixVault.Schemas.Snapshot
   alias PhoenixVault.Archivers.ArchiverConfig
-  use GenServer
 
-  def start_link(snapshot) do
-    GenServer.start_link(__MODULE__, snapshot,
-      name: {:via, Registry, {PhoenixVault.Archivers.Registry, {:pdf_archiver, snapshot.id}}}
-    )
-  end
-
-  @impl true
-  def init(snapshot) do
-    Logger.debug("PdfArchiver: Starting for snapshot #{snapshot.id}")
+  @impl Worker
+  def perform(%Job{args: %{"snapshot_id" => snapshot_id, "snapshot_url" => snapshot_url}}) do
+    Logger.debug("PdfArchiver: Starting for snapshot #{snapshot_id}")
 
     # todo add error handling
-    Task.start_link(fn ->
-      Logger.debug("PdfArchiver: Creating PDF for snapshot #{snapshot.id}")
-      print_pdf_for_url(snapshot)
+    Logger.debug("PdfArchiver: Creating PDF for snapshot #{snapshot_id}")
+    print_pdf_for_url(snapshot_id, snapshot_url)
+    Logger.debug("PdfArchiver: Finished creating the PDF for snapshot #{snapshot_id}")
 
-      Logger.debug("PdfArchiver: Finished creating the PDF for snapshot #{snapshot.id}")
+    PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
+      snapshot_id: snapshot_id,
+      updated_columns: %{is_pdf_saved: true}
+    })
 
-      PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
-        snapshot_id: snapshot.id,
-        updated_columns: %{is_pdf_saved: true}
-      })
-    end)
-
-    {:ok, snapshot}
+    {:ok, snapshot_id}
   end
 
-  defp print_pdf_for_url(%Snapshot{} = snapshot) do
-    ChromicPDF.print_to_pdfa({:url, snapshot.url},
-      output: Path.join(ArchiverConfig.snapshot_dir(snapshot), "#{snapshot.id}.pdf")
+  defp print_pdf_for_url(snapshot_id, snapshot_url) do
+    ChromicPDF.print_to_pdfa({:url, snapshot_url},
+      output: Path.join(ArchiverConfig.snapshot_dir(snapshot_id), "#{snapshot_id}.pdf")
     )
   end
 end
