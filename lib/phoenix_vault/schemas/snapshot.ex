@@ -3,6 +3,7 @@ defmodule PhoenixVault.Schemas.Snapshot do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :title, :url, :tags]}
   schema "snapshots" do
     field :title, :string
     field :url, :string

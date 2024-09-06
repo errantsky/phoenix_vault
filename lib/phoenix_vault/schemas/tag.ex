@@ -2,6 +2,7 @@ defmodule PhoenixVault.Schemas.Tag do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:name]}
   schema "tags" do
     field :name, :string
 

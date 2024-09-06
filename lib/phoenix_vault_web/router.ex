@@ -20,8 +20,6 @@ defmodule PhoenixVaultWeb.Router do
   scope "/", PhoenixVaultWeb do
     pipe_through :browser
 
-    # get "/", PageController, :home
-    # live "/", SnapshotsLive, :list_snapshots
     live_session(:authenticated, on_mount: [{PhoenixVaultWeb.UserAuth, :ensure_authenticated}]) do
       live "/", SnapshotLive.Index, :index
       live "/snapshots", SnapshotLive.Index, :index
@@ -36,9 +34,11 @@ defmodule PhoenixVaultWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", PhoenixVaultWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", PhoenixVaultWeb do
+    pipe_through :api
+    
+    post "/snapshots", SnapshotController, :create
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:phoenix_vault, :dev_routes) do

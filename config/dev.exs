@@ -2,7 +2,7 @@ import Config
 
 # Configure your database
 config :phoenix_vault, PhoenixVault.Repo,
-  username: "postgres",
+  username: "errantsky",
   password: "postgres",
   hostname: "localhost",
   database: "phoenix_vault_dev",

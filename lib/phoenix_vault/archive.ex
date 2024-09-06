@@ -80,6 +80,7 @@ defmodule PhoenixVault.Archive do
 
   """
   def create_snapshot(attrs \\ %{}, current_user) do
+    # todo add error handling
     tags =
       case attrs["tags"] do
         nil ->
@@ -101,8 +102,9 @@ defmodule PhoenixVault.Archive do
         user_id: current_user.id,
         tags: tags
       })
-
-    ArchiverSupervisor.start_link(snapshot)
+      
+      Logger.debug("create_snapshot snapshot: #{inspect(snapshot, pretty: true)}")
+      ArchiverSupervisor.start_link(snapshot)
 
     {:ok, snapshot}
   end
