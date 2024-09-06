@@ -26,6 +26,8 @@ config :phoenix_vault, PhoenixVaultWeb.Endpoint,
 # In test we don't send emails.
 config :phoenix_vault, PhoenixVault.Mailer, adapter: Swoosh.Adapters.Test
 
+config :phoenix_vault, Oban, testing: :inline
+
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 

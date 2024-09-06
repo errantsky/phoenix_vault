@@ -11,6 +11,7 @@ defmodule PhoenixVault.Application do
       {Registry, keys: :unique, name: PhoenixVault.Archivers.Registry},
       PhoenixVaultWeb.Telemetry,
       PhoenixVault.Repo,
+      {Oban, Application.fetch_env!(:phoenix_vault, Oban)},
       {DNSCluster, query: Application.get_env(:phoenix_vault, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: PhoenixVault.PubSub},
       # Start the Finch HTTP client for sending emails

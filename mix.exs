@@ -63,6 +63,7 @@ defmodule PhoenixVault.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:faker, "~> 0.18.0", only: [:dev, :test]},
+      {:oban, "~> 2.18"},
       # AI deps
       {:tiktoken, "~> 0.3"},
       {:pgvector, "~> 0.3.0"}

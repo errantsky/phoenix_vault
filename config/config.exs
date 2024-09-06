@@ -35,6 +35,11 @@ config :phoenix_vault, PhoenixVault.Mailer, adapter: Swoosh.Adapters.Local
 
 config :phoenix_vault, ChromicPDF, on_demand: false
 
+config :phoenix_vault, Oban,
+  engine: Oban.Engines.Basic,
+  queues: [default: 10],
+  repo: PhoenixVault.Repo
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
