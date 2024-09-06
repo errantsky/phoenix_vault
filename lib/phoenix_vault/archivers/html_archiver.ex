@@ -5,7 +5,9 @@ defmodule PhoenixVault.Archivers.HtmlArchiver do
   use GenServer
 
   def start_link(snapshot) do
-    GenServer.start_link(__MODULE__, snapshot, name: __MODULE__)
+    GenServer.start_link(__MODULE__, snapshot,
+      name: {:via, Registry, {PhoenixVault.Archivers.Registry, {:html_archiver, snapshot.id}}}
+    )
   end
 
   @impl true
@@ -17,7 +19,6 @@ defmodule PhoenixVault.Archivers.HtmlArchiver do
       # todo handle error
       {:ok, body} = archive_as_html(snapshot)
       Logger.debug("HtmlArchiver: Finished creating the HTML for snapshot #{snapshot.id}")
-
 
       Logger.debug("HtmlArchiver: Creating embedding for snapshot #{snapshot.id}")
       {:ok, embedding} = OpenAIClient.get_embedding(body)
@@ -36,8 +37,8 @@ defmodule PhoenixVault.Archivers.HtmlArchiver do
     archive_command =
       "wget --convert-links --adjust-extension --page-requisites #{snapshot.url} -P #{ArchiverConfig.snapshot_dir(snapshot)}"
 
-      # TODO 0 and other vals
-      {_, _exit_status} = System.cmd("sh", ["-c", archive_command])
+    # TODO 0 and other vals
+    {_, _exit_status} = System.cmd("sh", ["-c", archive_command])
 
     snapshot_dir = ArchiverConfig.snapshot_dir(snapshot)
     index_html_path = find_index_html(snapshot_dir)

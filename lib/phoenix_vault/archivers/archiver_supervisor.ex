@@ -8,7 +8,10 @@ defmodule PhoenixVault.Archivers.ArchiverSupervisor do
 
   def start_link(snapshot) do
     # TODO: Set unique name. Maybe base it on snapshot id
-    Supervisor.start_link(__MODULE__, snapshot, name: __MODULE__)
+    Supervisor.start_link(__MODULE__, snapshot,
+      name:
+        {:via, Registry, {PhoenixVault.Archivers.Registry, {:archiver_supervisor, snapshot.id}}}
+    )
   end
 
   @impl true

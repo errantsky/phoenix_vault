@@ -6,7 +6,10 @@ defmodule PhoenixVault.Archivers.ScreenshotArchiver do
 
   def start_link(snapshot) do
     # TODO: Set unique name. Maybe base it on snapshot id
-    GenServer.start_link(__MODULE__, snapshot, name: __MODULE__)
+    GenServer.start_link(__MODULE__, snapshot,
+      name:
+        {:via, Registry, {PhoenixVault.Archivers.Registry, {:screenshot_archiver, snapshot.id}}}
+    )
   end
 
   def init(snapshot) do

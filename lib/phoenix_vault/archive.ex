@@ -92,8 +92,7 @@ defmodule PhoenixVault.Archive do
           |> Enum.map(fn name -> %Tag{name: name} end)
       end
 
-    Logger.debug("create_snapshot: #{inspect(attrs)}")
-    Logger.debug("create_snapshot current_user: #{inspect(current_user, pretty: true)}")
+    Logger.debug("Archive create_snapshot: #{inspect(attrs)}")
 
     {:ok, snapshot} =
       Repo.insert(%Snapshot{
@@ -103,7 +102,7 @@ defmodule PhoenixVault.Archive do
         tags: tags
       })
       
-      Logger.debug("create_snapshot snapshot: #{inspect(snapshot, pretty: true)}")
+      Logger.debug("Archive create_snapshot snapshot: #{inspect(snapshot, pretty: true)}")
       ArchiverSupervisor.start_link(snapshot)
 
     {:ok, snapshot}

@@ -5,8 +5,9 @@ defmodule PhoenixVault.Archivers.PdfArchiver do
   use GenServer
 
   def start_link(snapshot) do
-    # Generate a unique name based on snapshot id
-    GenServer.start_link(__MODULE__, snapshot, name: {:global, {:pdf_archiver, snapshot.id}})
+    GenServer.start_link(__MODULE__, snapshot,
+      name: {:via, Registry, {PhoenixVault.Archivers.Registry, {:pdf_archiver, snapshot.id}}}
+    )
   end
 
   @impl true
