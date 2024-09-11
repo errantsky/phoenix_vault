@@ -59,11 +59,37 @@ defmodule PhoenixVault.Archive do
 
   """
   def get_snapshot!(id, current_user) do
+    # todo error handling
     if current_user == nil do
       Repo.get_by(Snapshot, id: id)
     else
       Repo.get_by(Snapshot, id: id, user_id: current_user.id)
     end
+    |> Repo.preload(:tags)
+  end
+
+  @doc """
+  Finds the first snapshot saved after the one currently being viewed
+
+  """
+  def get_next_snapshot(snapshot) do
+    Repo.one(
+      from s in Snapshot,
+        where: s.inserted_at > ^snapshot.inserted_at and s.user_id == ^snapshot.user_id,
+        order_by: [asc: s.inserted_at]
+    )
+    |> Repo.preload(:tags)
+  end
+
+  @doc """
+  Finds the first snapshot saved before the one currently being viewed
+  """
+  def get_prev_snapshot(snapshot) do
+    Repo.one(
+      from s in Snapshot,
+        where: s.inserted_at < ^snapshot.inserted_at and s.user_id == ^snapshot.user_id,
+        order_by: [asc: s.inserted_at]
+    )
     |> Repo.preload(:tags)
   end
 
@@ -119,9 +145,9 @@ defmodule PhoenixVault.Archive do
       Archivers.ScreenshotArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
     )
     |> PhoenixVault.Repo.transaction()
-    
+
     Logger.debug("Archive create_snapshot: finished queueing the archiver jobs with Oban")
-    
+
     # Return the created snapshot, immediately responding to the API request
     {:ok, snapshot}
   end

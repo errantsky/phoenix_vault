@@ -21,6 +21,7 @@ defmodule PhoenixVaultWeb.Router do
     pipe_through :browser
 
     live_session(:authenticated, on_mount: [{PhoenixVaultWeb.UserAuth, :ensure_authenticated}]) do
+      # list routes
       live "/", SnapshotLive.Index, :index
       live "/snapshots", SnapshotLive.Index, :index
       live "/snapshots/new", SnapshotLive.Index, :new
@@ -30,9 +31,12 @@ defmodule PhoenixVaultWeb.Router do
       live "/snapshots/:id/show/edit", SnapshotLive.Show, :edit
 
       live "/snapshots/:id/archive_view", SnapshotLive.ArchiveView, :view
+      
+      # viewer routes
+      live "/snapshots/view/:id/", SnapshotViewerLive, :show
     end
   end
-
+  
   # Other scopes may use custom stacks.
   scope "/api", PhoenixVaultWeb do
     pipe_through :api

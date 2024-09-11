@@ -40,25 +40,35 @@
     <%= snapshot.user_id %>
   </:col>
   <:col :let={{_id, snapshot}} label="Screenshot Saved">
-    <%= if snapshot.is_screenshot_saved do %>
-      ✅
-    <% else %>
-      ❌
-    <% end %>
+
+    <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=screenshot"}>
+      <%= if snapshot.is_screenshot_saved do %>
+        ✅
+      <% else %>
+        ❌
+      <% end %>
+    </.link>
   </:col>
+  
   <:col :let={{_id, snapshot}} label="PDF Saved">
+    <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=pdf"}>
+
     <%= if snapshot.is_pdf_saved do %>
       ✅
     <% else %>
       ❌
     <% end %>
+
+    </.link>
   </:col>
   <:col :let={{_id, snapshot}} label="HTML Saved">
+  <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=html"}>
     <%= if snapshot.is_html_saved do %>
       ✅
     <% else %>
       ❌
     <% end %>
+    </.link>
   </:col>
 
   <:action :let={{_id, snapshot}}>

@@ -11,6 +11,7 @@ defmodule PhoenixVaultWeb.SnapshotController do
   def create(conn, %{"snapshot" => snapshot_params}) do
     Logger.debug("SnapshotController.create conn: #{inspect(conn, pretty: true)}")
 
+    # todo: auth
     current_user = Repo.get!(User, 1)
 
     case Archive.create_snapshot(snapshot_params, current_user) do

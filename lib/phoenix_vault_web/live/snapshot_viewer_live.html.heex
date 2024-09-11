@@ -1,0 +1,118 @@
+<head>
+  <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.min.mjs"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf_viewer.min.css" />
+</head>
+
+
+<.header>
+  Snapshot Viewer for <%= @current_snapshot.id %>
+  <:subtitle>This is the archived view of your snapshot.</:subtitle>
+</.header>
+
+<div class="navigation-buttons" style="margin-top: 16px; display: flex; justify-content: space-between;">
+  <.button phx-click="prev" >>Previous</.button>
+  <.button phx-click="next" >>Next</.button>
+</div>
+
+<div class="snapshot-container" style="border: 1px solid black; padding: 16px; margin: 16px;">
+  <div class="source-selector">
+    <.button phx-click="pdf"
+      class={if @selected_source == "pdf", do: "btn-selected", else: "btn-not-selected"}
+      disabled={@selected_source == "pdf"}>
+      PDF
+    </.button> |
+    <.button phx-click="screenshot"
+      class={if @selected_source == "screenshot", do: "btn-selected", else: "btn-not-selected"}
+      disabled={@selected_source == "screenshot"}>
+      Screenshot
+    </.button> |
+    <.button phx-click="html"
+      class={if @selected_source == "html", do: "btn-selected", else: "btn-not-selected"}
+      disabled={@selected_source == "html"}>
+      HTML
+    </.button>
+  </div>
+
+  <div class="snapshot-content">
+    <%= case @selected_source do %>
+
+      <% "screenshot" -> %>
+        <!-- Display screenshot as an image -->
+        <img
+          src={@screenshot_path}
+          alt="Snapshot Screenshot"
+          style="width: 100%; height: auto;"
+        >
+
+      <% "html" -> %>
+        <!-- Embed HTML here -->
+        <iframe src={@html_path} style="width: 100%; height: 2000px; border: none;"></iframe>
+
+      <% "pdf" -> %>
+      <!-- Embed PDF with pagination controls -->
+      <div class="pdf-controls mb-4 flex justify-between items-center">
+        <button id="prev" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Previous</button>
+        <div>
+          Page: <span id="page_num" class="font-bold">1</span> / <span id="page_count" class="font-bold">1</span>
+        </div>
+        <button id="next" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Next</button>
+      </div>
+      
+      <canvas id="pdf-canvas" class="border w-full" style="height: auto;"></canvas>
+
+      <!-- PDF.js Initialization (Module version) -->
+      <script type="module">
+        import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.min.mjs';
+
+        // Set the workerSrc path
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs';
+
+        const url = "<%= @pdf_path %>";  // URL to the PDF
+
+        let pdfDoc = null;
+        let pageNum = 1;
+        const scale = 1.5;
+        const canvas = document.getElementById('pdf-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Function to render the page
+        async function renderPage(num) {
+          const page = await pdfDoc.getPage(num);
+          const viewport = page.getViewport({ scale });
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          const renderContext = {
+            canvasContext: ctx,
+            viewport: viewport
+          };
+          
+          await page.render(renderContext);
+
+          // Update page counters
+          document.getElementById('page_num').textContent = num;
+        }
+
+        // Load the PDF document
+        pdfjsLib.getDocument(url).promise.then(function(pdf) {
+          pdfDoc = pdf;
+          document.getElementById('page_count').textContent = pdfDoc.numPages;
+          renderPage(pageNum);  // Render the first page
+        });
+
+        // Set up previous and next page navigation
+        document.getElementById('prev').addEventListener('click', function() {
+          if (pageNum <= 1) return;
+          pageNum--;
+          renderPage(pageNum);
+        });
+
+        document.getElementById('next').addEventListener('click', function() {
+          if (pageNum >= pdfDoc.numPages) return;
+          pageNum++;
+          renderPage(pageNum);
+        });
+      </script>
+    <% end %>
+  </div>
+</div>
