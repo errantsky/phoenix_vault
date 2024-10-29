@@ -89,7 +89,7 @@ defmodule PhoenixVault.Archive do
     Repo.one(
       from s in Snapshot,
         where: s.inserted_at < ^snapshot.inserted_at and s.user_id == ^snapshot.user_id,
-        order_by: [asc: s.inserted_at],
+        order_by: [desc: s.inserted_at],
         limit: 1
     )
     |> Repo.preload(:tags)
