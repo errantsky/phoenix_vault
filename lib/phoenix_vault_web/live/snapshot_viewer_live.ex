@@ -67,14 +67,33 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
         socket
         |> assign(:current_snapshot, snapshot)
         |> assign(:selected_source, selected_source)
+        |> assign(
+          :pdf_path,
+          static_path(
+            socket,
+            Path.join(["/archive", to_string(snapshot.id), "#{snapshot.id}.pdf"])
+          )
+        )
+        |> assign(
+          :screenshot_path,
+          static_path(
+            socket,
+            Path.join(["/archive", to_string(snapshot.id), "#{snapshot.id}.png"])
+          )
+        )
+        |> assign(
+          :html_path,
+          static_path(
+            socket,
+            Path.join(["/archive", to_string(snapshot.id), ArchiverConfig.get_root_domain(snapshot.url), "index.html"])
+          )
+        )
 
       {:noreply, socket}
     end
 
   @impl true
   def handle_event("next", _unsigned_params, socket) do
-    # todo sustain selected_source
-
     Logger.debug(
       "Fetching next snapshot after snapshot id: #{socket.assigns.current_snapshot.id}"
     )
@@ -90,8 +109,10 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
 
   @impl true
   def handle_event("prev", _unsigned_params, socket) do
-    # todo sustain selected_source on refresh
-
+    Logger.debug(
+      "Fetching prev snapshot after snapshot id: #{socket.assigns.current_snapshot.id}"
+    )
+    
     case Archive.get_prev_snapshot(socket.assigns.current_snapshot) do
       nil ->
         {:noreply, socket}
