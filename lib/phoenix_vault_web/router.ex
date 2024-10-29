@@ -41,7 +41,7 @@ defmodule PhoenixVaultWeb.Router do
   scope "/api", PhoenixVaultWeb do
     pipe_through :api
     
-    post "/snapshots", SnapshotController, :create
+    resources "/snapshots", SnapshotController, except: [:new, :edit]
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

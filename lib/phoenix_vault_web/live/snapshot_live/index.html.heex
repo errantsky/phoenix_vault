@@ -41,7 +41,8 @@
   </:col>
   <:col :let={{_id, snapshot}} label="Screenshot Saved">
 
-    <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=screenshot"}>
+  <%!-- switch patch to proper params: <.link patch={path(~p"/users", sort_by: "name")}>Sort by name</.link> --%>
+  <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=screenshot"}>
       <%= if snapshot.is_screenshot_saved do %>
         ✅
       <% else %>

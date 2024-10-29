@@ -11,6 +11,7 @@
 
 <div class="navigation-buttons" style="margin-top: 16px; display: flex; justify-content: space-between;">
   <.button phx-click="prev" >>Previous</.button>
+  <a href={@current_snapshot.url} style="color: blue;">Snapshot URL</a>
   <.button phx-click="next" >>Next</.button>
 </div>
 
@@ -57,7 +58,7 @@
         </div>
         <button id="next" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Next</button>
       </div>
-      
+
       <canvas id="pdf-canvas" class="border w-full" style="height: auto;"></canvas>
 
       <!-- PDF.js Initialization (Module version) -->
@@ -86,7 +87,7 @@
             canvasContext: ctx,
             viewport: viewport
           };
-          
+
           await page.render(renderContext);
 
           // Update page counters

@@ -28,7 +28,6 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
         for={@form}
         id="snapshot-form"
         phx-target={@myself}
-        phx-change="validate"
         phx-submit="save"
       >
         <.input field={@form[:title]} label="Title" type="text" required />
