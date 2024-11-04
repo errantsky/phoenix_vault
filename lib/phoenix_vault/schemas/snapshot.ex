@@ -29,5 +29,6 @@ defmodule PhoenixVault.Schemas.Snapshot do
     |> validate_required([:title, :url, :user_id])
     |> unique_constraint(:url)
     |> put_assoc(:tags, Map.get(attrs, "tags", []))
+    |> update_change(:url, &String.trim/1)
   end
 end
