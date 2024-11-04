@@ -120,8 +120,6 @@ defmodule PhoenixVault.Archive do
           |> Enum.map(fn name -> %Tag{name: name} end)
       end
 
-    Logger.debug("Archive create_snapshot: #{inspect(attrs)}")
-
     %Snapshot{}
     |> Snapshot.changeset(%{
       url: attrs["url"],
@@ -240,16 +238,11 @@ defmodule PhoenixVault.Archive do
     attrs = attrs |> Enum.into(%{}, fn {key, value} -> {to_string(key), value} end)
     attrs = Map.put(attrs, "tags", tag_structs)
 
-    Logger.debug("attrs is: #{inspect(attrs)}")
-
     snapshot = Repo.preload(snapshot, :tags)
     changeset = Snapshot.changeset(snapshot, attrs)
 
-    Logger.debug("changeset is: #{inspect(changeset)}")
-
     case Repo.update(changeset) do
       {:ok, updated_snapshot} ->
-        Logger.debug("updated_snapshot is: #{inspect(updated_snapshot)}")
         {:ok, updated_snapshot}
 
       {:error, changeset} ->
@@ -259,16 +252,11 @@ defmodule PhoenixVault.Archive do
   end
 
   def update_archiver_status(%Snapshot{} = snapshot, attrs) do
-    Logger.debug("update_archiver_status: attrs is: #{inspect(attrs)}")
-
     snapshot = Repo.preload(snapshot, :tags)
     changeset = Snapshot.changeset(snapshot, attrs)
 
-    Logger.debug("update_archiver_status: changeset is: #{inspect(changeset)}")
-
     case Repo.update(changeset) do
       {:ok, updated_snapshot} ->
-        Logger.debug("update_archiver_status: updated_snapshot is: #{inspect(updated_snapshot)}")
         {:ok, updated_snapshot}
 
       {:error, changeset} ->
@@ -304,8 +292,6 @@ defmodule PhoenixVault.Archive do
   """
   def change_snapshot(%Snapshot{} = snapshot, attrs \\ %{}) do
     snapshot = Repo.preload(snapshot, :tags)
-    Logger.debug("archive change_snapshot attrs: #{inspect(attrs)}")
-
     attrs =
       case Map.get(attrs, "tags") do
         nil -> attrs

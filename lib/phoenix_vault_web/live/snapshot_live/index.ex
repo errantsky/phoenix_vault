@@ -68,17 +68,13 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
         },
         socket
       ) do
-    Logger.debug(
-      "index handle_info archiver_update fetching snapshot #{snapshot_id} to update #{inspect(updated_columns)}"
-    )
+
 
     snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns.current_user)
 
     case Archive.update_snapshot(snapshot, updated_columns) do
       {:ok, updated_snapshot} ->
-        Logger.debug(
-          "index handle_info archiver_update updated_snapshot: #{inspect(updated_snapshot, pretty: true)}"
-        )
+
 
         {:noreply, stream_insert(socket, :snapshots, updated_snapshot, limit: @per_page)}
 
@@ -107,7 +103,6 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
         offset: 0
       )
 
-    Logger.debug("handle_event search: Fetched #{snapshots |> length()} queries.")
     {:noreply, assign(socket, :search_query, query) |> stream(:snapshots, snapshots, reset: true)}
   end
 
