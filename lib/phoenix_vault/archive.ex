@@ -122,36 +122,43 @@ defmodule PhoenixVault.Archive do
 
     Logger.debug("Archive create_snapshot: #{inspect(attrs)}")
 
-    # Insert the snapshot record into the database
-    {:ok, snapshot} =
-      Repo.insert(%Snapshot{
-        url: attrs["url"],
-        title: attrs["title"],
-        user_id: current_user.id,
-        tags: tags
-      })
+    %Snapshot{}
+    |> Snapshot.changeset(%{
+      url: attrs["url"],
+      title: attrs["title"],
+      user_id: current_user.id,
+      tags: tags
+    })
+    |> Repo.insert()
+    |> case do
+      {:ok, snapshot} ->
+        Logger.debug("Successfully created the snapshot.")
+        Logger.debug("Archive create_snapshot: starteing to queue the archiver jobs with Oban")
 
-    Logger.debug("Archive create_snapshot: starting queueing the archiver jobs with Oban")
+        Ecto.Multi.new()
+        |> Oban.insert(
+          "pdf-archiver-#{snapshot.id}",
+          Archivers.PdfArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
+        )
+        |> Oban.insert(
+          "html-archiver-#{snapshot.id}",
+          Archivers.HtmlArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
+        )
+        |> Oban.insert(
+          "screenshot-archiver-#{snapshot.id}",
+          Archivers.ScreenshotArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
+        )
+        |> PhoenixVault.Repo.transaction()
 
-    Ecto.Multi.new()
-    |> Oban.insert(
-      "pdf-archiver-#{snapshot.id}",
-      Archivers.PdfArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
-    )
-    |> Oban.insert(
-      "html-archiver-#{snapshot.id}",
-      Archivers.HtmlArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
-    )
-    |> Oban.insert(
-      "screenshot-archiver-#{snapshot.id}",
-      Archivers.ScreenshotArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
-    )
-    |> PhoenixVault.Repo.transaction()
+        Logger.debug("Archive create_snapshot: finished queueing the archiver jobs with Oban")
+        
+        # Return the created snapshot, immediately responding to the API request
+        {:ok, snapshot}
 
-    Logger.debug("Archive create_snapshot: finished queueing the archiver jobs with Oban")
-
-    # Return the created snapshot, immediately responding to the API request
-    {:ok, snapshot}
+      {:error, changeset} ->
+        Logger.debug("Snapshot creation failed: #{IO.inspect(changeset)}")
+        {:error, changeset}
+    end
   end
 
   @doc """
