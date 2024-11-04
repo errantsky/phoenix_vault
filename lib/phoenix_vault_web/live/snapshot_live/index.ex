@@ -163,13 +163,14 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
     case snapshots do
       [] ->
         Logger.debug("paginate_snapshots hit no posts: #{at} #{at == -1}")
-        assign(socket, end_of_timeline?: at == -1)
-
-      [_ | _] = snapshots ->
+        socket
+        |> assign(end_of_timeline?: at == -1)
+        
+      _ ->
         socket
         |> assign(:end_of_timeline?, false)
         |> assign(:page, new_page)
-        |> stream(:snapshots, snapshots, at: at, limit: limit)
     end
+    |> stream(:snapshots, snapshots, at: at, limit: limit)
   end
 end
