@@ -29,8 +29,6 @@ defmodule PhoenixVaultWeb.Router do
 
       live "/snapshots/:id", SnapshotLive.Show, :show
       live "/snapshots/:id/show/edit", SnapshotLive.Show, :edit
-
-      live "/snapshots/:id/archive_view", SnapshotLive.ArchiveView, :view
       
       # viewer routes
       live "/snapshots/view/:id/", SnapshotViewerLive, :show

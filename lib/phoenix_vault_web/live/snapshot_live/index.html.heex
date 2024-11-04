@@ -17,7 +17,7 @@
 
 <.snapshot_table id="snapshots" rows={@streams.snapshots} page={@page} end_of_timeline?={@end_of_timeline?}>
   <:col :let={{_id, snapshot}} label="Title">
-    <.link navigate={~p"/snapshots/#{snapshot.id}/archive_view"}>
+    <.link navigate={~p"/snapshots/view/#{snapshot.id}"}>
       <%= snapshot.title %>
     </.link>
   </:col>
