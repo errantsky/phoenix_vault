@@ -144,12 +144,21 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   end
 
   @impl true
-  def handle_event("focus-search", %{"key" => "/"}, socket) do
-    {:noreply, push_event(socket, "focus_search_input", %{})}
+  def handle_event("keyboard-shortcut", %{"key" => key}, socket) do
+    case key do
+      "/" ->
+        {:noreply, push_event(socket, "focus_search_input", %{})}
+
+      "n" ->
+        {:noreply, push_patch(socket, to: ~p"/snapshots/new")}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
 
   @impl true
-  def handle_event("focus-search", _, socket) do
+  def handle_event("keyboard-shortcut", _, socket) do
     {:noreply, socket}
   end
 
