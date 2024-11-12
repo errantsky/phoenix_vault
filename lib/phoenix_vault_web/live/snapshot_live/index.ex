@@ -162,6 +162,16 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
     {:noreply, socket}
   end
 
+  @impl true
+  def handle_event("refresh_snapshot", %{"sid" => snapshot_id}, socket) do
+    Logger.debug("Triggering a refresh event.")
+    
+    snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns[:current_user])
+    Archive.refresh_snapshot(snapshot)
+
+    {:noreply, socket |> put_flash(:info, "Triggering snapshot archive refresh.")}
+  end
+
   defp paginate_snapshots(socket, new_page) when new_page >= 1 do
     %{page: cur_page, per_page: per_page, current_user: current_user} = socket.assigns
 

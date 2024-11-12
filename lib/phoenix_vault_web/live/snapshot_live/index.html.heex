@@ -81,6 +81,11 @@
       <% end %>
     </.link>
   </:col>
+  <:col :let={{_id, snapshot}} label="Re-snapshot">
+    <.link phx-click="refresh_snapshot" phx-value-sid={snapshot.id}>
+      ♻️
+    </.link>
+  </:col>
 
   <:action :let={{_id, snapshot}}>
     <div class="sr-only">

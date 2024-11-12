@@ -149,7 +149,7 @@ defmodule PhoenixVault.Archive do
         |> PhoenixVault.Repo.transaction()
 
         Logger.debug("Archive create_snapshot: finished queueing the archiver jobs with Oban")
-        
+
         # Return the created snapshot, immediately responding to the API request
         {:ok, snapshot}
 
@@ -157,6 +157,43 @@ defmodule PhoenixVault.Archive do
         Logger.debug("Snapshot creation failed: #{IO.inspect(changeset)}")
         {:error, changeset}
     end
+  end
+
+  @doc """
+  Refreshed a snapshot's archives.
+
+  ## Examples
+
+      iex> refresh_snapshot(%{field: value})
+      {:ok, %Snapshot{}}
+
+      iex> refresh_snapshot(%{field: bad_value})
+      {:error, ...}
+
+  """
+  def refresh_snapshot(snapshot) do
+    Logger.debug("Archive: Refreshing snapshot")
+    
+    File.rm_rf!(Archivers.ArchiverConfig.snapshot_dir(snapshot.id))
+
+    Ecto.Multi.new()
+    |> Oban.insert(
+      "pdf-archiver-#{snapshot.id}",
+      Archivers.PdfArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
+    )
+    |> Oban.insert(
+      "html-archiver-#{snapshot.id}",
+      Archivers.HtmlArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
+    )
+    |> Oban.insert(
+      "screenshot-archiver-#{snapshot.id}",
+      Archivers.ScreenshotArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
+    )
+    |> PhoenixVault.Repo.transaction()
+
+    Logger.debug("Archive refresh_snapshot: finished queueing the archiver jobs with Oban")
+
+    {:ok, snapshot}
   end
 
   @doc """
@@ -292,6 +329,7 @@ defmodule PhoenixVault.Archive do
   """
   def change_snapshot(%Snapshot{} = snapshot, attrs \\ %{}) do
     snapshot = Repo.preload(snapshot, :tags)
+
     attrs =
       case Map.get(attrs, "tags") do
         nil -> attrs
