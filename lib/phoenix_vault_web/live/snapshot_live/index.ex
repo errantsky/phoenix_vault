@@ -4,9 +4,9 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
 
   alias PhoenixVault.Archive
   alias PhoenixVault.Schemas.Snapshot
-  
+
   @per_page Archive.snapshot_table_per_page()
-  @overfetch_factor Archive.snapshot_table_overfetch_factor
+  @overfetch_factor Archive.snapshot_table_overfetch_factor()
 
   @impl true
   def mount(_params, _session, socket) do
@@ -68,14 +68,10 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
         },
         socket
       ) do
-
-
     snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns.current_user)
 
     case Archive.update_snapshot(snapshot, updated_columns) do
       {:ok, updated_snapshot} ->
-
-
         {:noreply, stream_insert(socket, :snapshots, updated_snapshot, limit: @per_page)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -147,6 +143,16 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
     end
   end
 
+  @impl true
+  def handle_event("focus-search", %{"key" => "/"}, socket) do
+    {:noreply, push_event(socket, "focus_search_input", %{})}
+  end
+
+  @impl true
+  def handle_event("focus-search", _, socket) do
+    {:noreply, socket}
+  end
+
   defp paginate_snapshots(socket, new_page) when new_page >= 1 do
     %{page: cur_page, per_page: per_page, current_user: current_user} = socket.assigns
 
@@ -163,9 +169,10 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
     case snapshots do
       [] ->
         Logger.debug("paginate_snapshots hit no posts: #{at} #{at == -1}")
+
         socket
         |> assign(end_of_timeline?: at == -1)
-        
+
       _ ->
         socket
         |> assign(:end_of_timeline?, false)

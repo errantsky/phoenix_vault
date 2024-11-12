@@ -8,14 +8,27 @@
 </.header>
 
 <form phx-submit="search" phx-change="change_query" class="search-form">
-  <input type="text" name="query" placeholder="Search..." value={@search_query || ""} />
+  <input
+    id="search-input"
+    phx-window-keydown="focus-search"
+    phx-hook="FocusSearch"
+    type="text"
+    name="query"
+    placeholder="Type '/' to search"
+    value={@search_query || ""}
+  />
   <button type="submit">Search</button>
   <%= if @search_query && @search_query != "" do %>
     <button type="button" phx-click="reset_search" class="reset-button">✖</button>
   <% end %>
 </form>
 
-<.snapshot_table id="snapshots" rows={@streams.snapshots} page={@page} end_of_timeline?={@end_of_timeline?}>
+<.snapshot_table
+  id="snapshots"
+  rows={@streams.snapshots}
+  page={@page}
+  end_of_timeline?={@end_of_timeline?}
+>
   <:col :let={{_id, snapshot}} label="Title">
     <.link navigate={~p"/snapshots/view/#{snapshot.id}"}>
       <%= snapshot.title %>
@@ -40,9 +53,8 @@
     <%= snapshot.user_id %>
   </:col>
   <:col :let={{_id, snapshot}} label="Screenshot Saved">
-
-  <%!-- switch patch to proper params: <.link patch={path(~p"/users", sort_by: "name")}>Sort by name</.link> --%>
-  <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=screenshot"}>
+    <%!-- todo switch patch to proper params: <.link patch={path(~p"/users", sort_by: "name")}>Sort by name</.link> --%>
+    <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=screenshot"}>
       <%= if snapshot.is_screenshot_saved do %>
         ✅
       <% else %>
@@ -50,25 +62,23 @@
       <% end %>
     </.link>
   </:col>
-  
+
   <:col :let={{_id, snapshot}} label="PDF Saved">
     <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=pdf"}>
-
-    <%= if snapshot.is_pdf_saved do %>
-      ✅
-    <% else %>
-      ❌
-    <% end %>
-
+      <%= if snapshot.is_pdf_saved do %>
+        ✅
+      <% else %>
+        ❌
+      <% end %>
     </.link>
   </:col>
   <:col :let={{_id, snapshot}} label="HTML Saved">
-  <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=html"}>
-    <%= if snapshot.is_html_saved do %>
-      ✅
-    <% else %>
-      ❌
-    <% end %>
+    <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=html"}>
+      <%= if snapshot.is_html_saved do %>
+        ✅
+      <% else %>
+        ❌
+      <% end %>
     </.link>
   </:col>
 
