@@ -17,9 +17,9 @@
     placeholder="Type '/' to search"
     value={@search_query || ""}
   />
-  <button type="submit">Search</button>
+  <.button type="submit" class="ml-3" >Search</.button>
   <%= if @search_query && @search_query != "" do %>
-    <button type="button" phx-click="reset_search" class="reset-button">✖</button>
+    <.button type="button" phx-click="reset_search" class="ml-3 reset-button">✖</.button>
   <% end %>
 </form>
 
