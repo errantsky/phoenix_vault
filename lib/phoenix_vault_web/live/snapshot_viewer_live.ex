@@ -151,6 +151,20 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
       _ -> {:noreply, socket}
     end
   end
+  
+  @impl true
+  def handle_event("navigate-snapshot", %{"key" => key} = params, socket) do
+    case key do
+      "ArrowRight" -> handle_event("next", params, socket)
+      "ArrowLeft" -> handle_event("prev", params, socket)
+      _ -> {:noreply, socket}
+    end
+  end
+  
+  @impl true
+  def handle_event("navigate-snapshot", _, socket) do
+    {:noreply, socket}
+  end
 
   @impl true
   def handle_event("screenshot", _unsigned_params, socket) do
