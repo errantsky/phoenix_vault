@@ -173,27 +173,48 @@ defmodule PhoenixVault.Archive do
   """
   def refresh_snapshot(snapshot) do
     Logger.debug("Archive: Refreshing snapshot")
-    
+
     File.rm_rf!(Archivers.ArchiverConfig.snapshot_dir(snapshot.id))
 
-    Ecto.Multi.new()
-    |> Oban.insert(
-      "pdf-archiver-#{snapshot.id}",
-      Archivers.PdfArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
-    )
-    |> Oban.insert(
-      "html-archiver-#{snapshot.id}",
-      Archivers.HtmlArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
-    )
-    |> Oban.insert(
-      "screenshot-archiver-#{snapshot.id}",
-      Archivers.ScreenshotArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
-    )
-    |> PhoenixVault.Repo.transaction()
+    # reset archive icons
+    case update_snapshot(snapshot, %{
+           is_screenshot_saved: false,
+           is_pdf_saved: false,
+           is_html_saved: false
+         }) do
+      {:ok, updated_snapshot} ->
+        Ecto.Multi.new()
+        |> Oban.insert(
+          "pdf-archiver-#{updated_snapshot.id}",
+          Archivers.PdfArchiver.new(%{
+            snapshot_id: updated_snapshot.id,
+            snapshot_url: updated_snapshot.url
+          })
+        )
+        |> Oban.insert(
+          "html-archiver-#{updated_snapshot.id}",
+          Archivers.HtmlArchiver.new(%{
+            snapshot_id: updated_snapshot.id,
+            snapshot_url: updated_snapshot.url
+          })
+        )
+        |> Oban.insert(
+          "screenshot-archiver-#{snapshot.id}",
+          Archivers.ScreenshotArchiver.new(%{
+            snapshot_id: updated_snapshot.id,
+            snapshot_url: updated_snapshot.url
+          })
+        )
+        |> PhoenixVault.Repo.transaction()
 
-    Logger.debug("Archive refresh_snapshot: finished queueing the archiver jobs with Oban")
+        Logger.debug("Archive refresh_snapshot: finished queueing the archiver jobs with Oban")
 
-    {:ok, snapshot}
+        {:ok, updated_snapshot}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        Logger.error("Archive refresh snapshot failed to reset archive statuses.")
+        {:noreply, changeset}
+    end
   end
 
   @doc """

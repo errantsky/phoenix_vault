@@ -165,9 +165,20 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   @impl true
   def handle_event("refresh_snapshot", %{"sid" => snapshot_id}, socket) do
     Logger.debug("Triggering a refresh event.")
-    
+
     snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns[:current_user])
-    Archive.refresh_snapshot(snapshot)
+
+    case Archive.refresh_snapshot(snapshot) do
+      {:ok, updated_snapshot} ->
+        {:noreply, stream_insert(socket, :snapshots, updated_snapshot, limit: @per_page)}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        Logger.error(
+          "Index handle_info refresh_snapshot: Failed to update the snapshot #{snapshot.id}: #{inspect(changeset)}"
+        )
+
+        {:noreply, socket}
+    end
 
     {:noreply, socket |> put_flash(:info, "Triggering snapshot archive refresh.")}
   end
