@@ -154,7 +154,7 @@ defmodule PhoenixVault.Archive do
         {:ok, snapshot}
 
       {:error, changeset} ->
-        Logger.debug("Snapshot creation failed: #{IO.inspect(changeset)}")
+        Logger.debug("Snapshot creation failed: #{inspect(changeset)}")
         {:error, changeset}
     end
   end
