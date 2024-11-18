@@ -56,9 +56,9 @@
     <%!-- todo switch patch to proper params: <.link patch={path(~p"/users", sort_by: "name")}>Sort by name</.link> --%>
     <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=screenshot"}>
       <%= if snapshot.is_screenshot_saved do %>
-        <Heroicons.check_circle micro style="color: green;" />
+        <Heroicons.check_circle micro style="color: green;" class="w-6 h-6" />
       <% else %>
-        <Heroicons.x_circle micro style="color: red;" />
+        <Heroicons.x_circle micro style="color: red;" class="w-6 h-6" />
       <% end %>
     </.link>
   </:col>
@@ -66,24 +66,24 @@
   <:col :let={{_id, snapshot}} label="PDF Saved">
     <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=pdf"}>
       <%= if snapshot.is_pdf_saved do %>
-        <Heroicons.check_circle micro style="color: green;" />
+        <Heroicons.check_circle micro style="color: green;" class="w-6 h-6" />
       <% else %>
-        <Heroicons.x_circle micro style="color: red;" />
+        <Heroicons.x_circle micro style="color: red;" class="w-6 h-6" />
       <% end %>
     </.link>
   </:col>
   <:col :let={{_id, snapshot}} label="HTML Saved">
     <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=html"}>
       <%= if snapshot.is_html_saved do %>
-        <Heroicons.check_circle micro style="color: green;" />
+        <Heroicons.check_circle micro style="color: green;" class="w-6 h-6" />
       <% else %>
-        <Heroicons.x_circle micro style="color: red;" />
+        <Heroicons.x_circle micro style="color: red;" class="w-6 h-6" />
       <% end %>
     </.link>
   </:col>
   <:col :let={{_id, snapshot}} label="Re-snapshot">
     <.link phx-click="refresh_snapshot" phx-value-sid={snapshot.id}>
-      <Heroicons.arrow_path micro style="color: green;" />
+      <Heroicons.arrow_path micro style="color: green;" class="w-6 h-6" />
     </.link>
   </:col>
 
