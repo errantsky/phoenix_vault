@@ -124,25 +124,16 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
 
   @impl true
   def handle_event("screenshot", _unsigned_params, socket) do
-    socket = socket
-    |> assign(:selected_source, "screenshot")
-
-    {:noreply, socket}
+    {:noreply, push_patch(socket, to: ~p"/snapshots/view/#{socket.assigns.current_snapshot.id}?selected_source=screenshot")}
   end
 
   @impl true
   def handle_event("pdf", _unsigned_params, socket) do
-    socket = socket
-    |> assign(:selected_source, "pdf")
-
-    {:noreply, socket}
+    {:noreply, push_patch(socket, to: ~p"/snapshots/view/#{socket.assigns.current_snapshot.id}?selected_source=pdf")}
   end
 
   @impl true
   def handle_event("html", _unsigned_params, socket) do
-    socket = socket
-    |> assign(:selected_source, "html")
-
-    {:noreply, socket}
+    {:noreply, push_patch(socket, to: ~p"/snapshots/view/#{socket.assigns.current_snapshot.id}?selected_source=html")}
   end
 end
