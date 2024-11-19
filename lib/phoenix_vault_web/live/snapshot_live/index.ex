@@ -144,8 +144,22 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   end
 
   @impl true
-  def handle_event("open-new-snapshot-modal", _params, socket) do
-    {:noreply, push_patch(socket, to: ~p"/snapshots/new")}
+  def handle_event("keyboard-shortcut", %{"key" => key}, socket) do
+    case key do
+      "/" ->
+        {:noreply, push_event(socket, "focus_search_input", %{})}
+
+      "n" ->
+        {:noreply, push_patch(socket, to: ~p"/snapshots/new")}
+
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_event("keyboard-shortcut", _, socket) do
+    {:noreply, socket}
   end
 
   @impl true
