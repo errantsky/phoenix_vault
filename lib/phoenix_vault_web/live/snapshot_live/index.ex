@@ -158,11 +158,6 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   end
 
   @impl true
-  def handle_event("keyboard-shortcut", _, socket) do
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_event("refresh_snapshot", %{"sid" => snapshot_id}, socket) do
     Logger.debug("Triggering a refresh event.")
 

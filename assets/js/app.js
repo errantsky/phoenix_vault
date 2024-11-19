@@ -38,7 +38,23 @@ let Hooks = {}
 Hooks.FocusSearch = {
   mounted() {
     this.handleEvent("focus_search_input", () => {
-      document.getElementById("search-input").focus()
+      document.getElementById("search-input").focus();
+    });
+    
+    window.addEventListener("keydown", (event) => {
+      const activeElement = document.activeElement;
+      
+      if (
+        activeElement.tagName === "INPUT" ||
+        activeElement.tagName == "TEXTAREA" ||
+        activeElement.isContentEditable
+      ) {
+        return;
+      }
+      
+      if (["/", "n"].includes(event.key)) {
+        this.pushEvent("keyboard-shortcut", { key: event.key })
+      }
     });
   },
 };
