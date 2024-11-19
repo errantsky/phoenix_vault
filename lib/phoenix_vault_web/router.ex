@@ -13,10 +13,6 @@ defmodule PhoenixVaultWeb.Router do
     plug :fetch_current_user
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
-  end
-
   scope "/", PhoenixVaultWeb do
     pipe_through :browser
 
@@ -35,13 +31,6 @@ defmodule PhoenixVaultWeb.Router do
     end
   end
   
-  # Other scopes may use custom stacks.
-  scope "/api", PhoenixVaultWeb do
-    pipe_through :api
-    
-    resources "/snapshots", SnapshotController, except: [:new, :edit]
-  end
-
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:phoenix_vault, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
