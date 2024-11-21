@@ -72,6 +72,8 @@ defmodule PhoenixVaultWeb.UserConfirmationLiveTest do
     end
 
     test "does not confirm email with invalid token", %{conn: conn, user: user} do
+      conn = log_in_user(conn, user)
+      
       {:ok, lv, _html} = live(conn, ~p"/users/confirm/invalid-token")
 
       {:ok, conn} =
