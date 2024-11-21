@@ -133,7 +133,7 @@ defmodule PhoenixVault.Archive do
         Logger.debug("Successfully created the snapshot.")
         Logger.debug("Archive create_snapshot: starteing to queue the archiver jobs with Oban")
 
-        if delay_archiving do
+        if delay_archiving || Application.get_env(:phoenix_vault, :archiver_enabled) != "true" do
           {:ok, snapshot}
         else
           Ecto.Multi.new()

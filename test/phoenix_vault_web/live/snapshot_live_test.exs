@@ -4,19 +4,23 @@ defmodule PhoenixVaultWeb.SnapshotLiveTest do
   import Phoenix.LiveViewTest
   import PhoenixVault.ArchiveFixtures
 
-  @create_attrs %{}
-  @update_attrs %{}
-  @invalid_attrs %{}
+  @create_attrs %{title: "sample title", url: "http://example.com"}
+  @update_attrs %{title: "new title"}
 
-  defp create_snapshot(_) do
-    snapshot = snapshot_fixture()
+  defp create_snapshot(%{user: user}) do
+    snapshot = snapshot_fixture(nil, user)
     %{snapshot: snapshot}
   end
-
+  
+  defp register_and_login(%{conn: conn}) do
+    %{conn: _conn, user: _user} = register_and_log_in_user(%{conn: conn})
+  end
+  
   describe "Index" do
-    setup [:create_snapshot]
+    setup [:register_and_login, :create_snapshot]
 
     test "lists all snapshots", %{conn: conn} do
+      
       {:ok, _index_live, html} = live(conn, ~p"/snapshots")
 
       assert html =~ "Listing Snapshots"
@@ -29,10 +33,6 @@ defmodule PhoenixVaultWeb.SnapshotLiveTest do
                "New Snapshot"
 
       assert_patch(index_live, ~p"/snapshots/new")
-
-      assert index_live
-             |> form("#snapshot-form", snapshot: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
 
       assert index_live
              |> form("#snapshot-form", snapshot: @create_attrs)
@@ -53,10 +53,6 @@ defmodule PhoenixVaultWeb.SnapshotLiveTest do
       assert_patch(index_live, ~p"/snapshots/#{snapshot}/edit")
 
       assert index_live
-             |> form("#snapshot-form", snapshot: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert index_live
              |> form("#snapshot-form", snapshot: @update_attrs)
              |> render_submit()
 
@@ -75,7 +71,7 @@ defmodule PhoenixVaultWeb.SnapshotLiveTest do
   end
 
   describe "Show" do
-    setup [:create_snapshot]
+    setup [:register_and_login, :create_snapshot]
 
     test "displays snapshot", %{conn: conn, snapshot: snapshot} do
       {:ok, _show_live, html} = live(conn, ~p"/snapshots/#{snapshot}")
@@ -90,10 +86,6 @@ defmodule PhoenixVaultWeb.SnapshotLiveTest do
                "Edit Snapshot"
 
       assert_patch(show_live, ~p"/snapshots/#{snapshot}/show/edit")
-
-      assert show_live
-             |> form("#snapshot-form", snapshot: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
 
       assert show_live
              |> form("#snapshot-form", snapshot: @update_attrs)

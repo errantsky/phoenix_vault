@@ -21,6 +21,10 @@ if System.get_env("PHX_SERVER") do
 end
 
 config :phoenix_vault,
+       :archiver_enabled,
+       System.get_env("ARCHIVER_ENABLED") == "true"
+
+config :phoenix_vault,
        :archive_dir,
        System.get_env("ARCHIVE_DIR") ||
          raise("""
