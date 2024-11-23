@@ -1,5 +1,9 @@
 import Config
 
+config :phoenix_vault,
+       :archiver_enabled,
+       true
+
 # Configure your database
 config :phoenix_vault, PhoenixVault.Repo,
   username: "errantsky",
