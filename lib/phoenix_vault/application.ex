@@ -20,13 +20,17 @@ defmodule PhoenixVault.Application do
       # {PhoenixVault.Worker, arg},
       # Start to serve requests, typically the last entry
       PhoenixVaultWeb.Endpoint,
-      ChromicPDF
+      {ChromicPDF, chromic_pdf_opts()}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: PhoenixVault.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  defp chromic_pdf_opts() do
+    [disable_scripts: true, offline: true, on_demand: true]
   end
 
   # Tell Phoenix to update the endpoint configuration

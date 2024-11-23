@@ -21,7 +21,7 @@ defmodule PhoenixVault.Archivers.HtmlArchiver do
 
   defp archive_as_html(snapshot_id, snapshot_url) do
     archive_command =
-      "wget --no-parent --convert-links --adjust-extension --page-requisites --reject=*.js #{snapshot_url} -P #{ArchiverConfig.snapshot_dir(snapshot_id)}"
+      "wget --no-parent --adjust-extension --page-requisites --reject=*.js #{snapshot_url} -P #{ArchiverConfig.snapshot_dir(snapshot_id)}"
 
 
     {_output, _exit_status} = System.cmd("sh", ["-c", archive_command])
