@@ -31,7 +31,6 @@ defmodule PhoenixVault.Archive do
     offset = Keyword.get(opts, :offset)
     limit = Keyword.get(opts, :limit)
     query = Keyword.get(opts, :query)
-    Logger.debug("paginate_snapshots: started.")
 
     if query do
       EmbeddingSearch.find_snapshots_from_query(query, current_user.id, @per_page)
@@ -130,9 +129,6 @@ defmodule PhoenixVault.Archive do
     |> Repo.insert()
     |> case do
       {:ok, snapshot} ->
-        Logger.debug("Successfully created the snapshot.")
-        Logger.debug("Archive create_snapshot: starteing to queue the archiver jobs with Oban")
-
         if delay_archiving || Application.get_env(:phoenix_vault, :archiver_enabled) != "true" do
           {:ok, snapshot}
         else
@@ -154,14 +150,11 @@ defmodule PhoenixVault.Archive do
           )
           |> PhoenixVault.Repo.transaction()
 
-          Logger.debug("Archive create_snapshot: finished queueing the archiver jobs with Oban")
-
           # Return the created snapshot, immediately responding to the API request
           {:ok, snapshot}
         end
 
       {:error, changeset} ->
-        Logger.debug("Snapshot creation failed: #{inspect(changeset)}")
         {:error, changeset}
     end
   end
@@ -179,8 +172,6 @@ defmodule PhoenixVault.Archive do
 
   """
   def refresh_snapshot(snapshot) do
-    Logger.debug("Archive: Refreshing snapshot")
-
     File.rm_rf!(Archivers.ArchiverConfig.snapshot_dir(snapshot.id))
 
     # reset archive icons
@@ -214,12 +205,9 @@ defmodule PhoenixVault.Archive do
         )
         |> PhoenixVault.Repo.transaction()
 
-        Logger.debug("Archive refresh_snapshot: finished queueing the archiver jobs with Oban")
-
         {:ok, updated_snapshot}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        Logger.error("Archive refresh snapshot failed to reset archive statuses.")
         {:noreply, changeset}
     end
   end
@@ -265,8 +253,6 @@ defmodule PhoenixVault.Archive do
         end
       )
 
-    Logger.debug("bulk_create_snapshots result: #{inspect(grouped_insert_results, pretty: true)}")
-
     if Enum.empty?(grouped_insert_results[:ok]) do
       {:error, grouped_insert_results}
     else
@@ -311,7 +297,6 @@ defmodule PhoenixVault.Archive do
         {:ok, updated_snapshot}
 
       {:error, changeset} ->
-        Logger.debug("error is: #{inspect(changeset)}")
         {:error, changeset}
     end
   end
@@ -325,7 +310,6 @@ defmodule PhoenixVault.Archive do
         {:ok, updated_snapshot}
 
       {:error, changeset} ->
-        Logger.debug("update_archiver_status: error is: #{inspect(changeset)}")
         {:error, changeset}
     end
   end
@@ -343,6 +327,7 @@ defmodule PhoenixVault.Archive do
 
   """
   def delete_snapshot(%Snapshot{} = snapshot) do
+    File.rm_rf!(Archivers.ArchiverConfig.snapshot_dir(snapshot.id))
     Repo.delete(snapshot)
   end
 

@@ -5,14 +5,10 @@ defmodule PhoenixVault.Archivers.ScreenshotArchiver do
 
   @impl Worker
   def perform(%Job{args: %{"snapshot_id" => snapshot_id, "snapshot_url" => snapshot_url}}) do
-    Logger.debug("ScreenshotArchiver: Starting for snapshot #{snapshot_id}")
 
-    Logger.debug("ScreenshotArchiver: Creating screenshot for snapshot #{snapshot_id}")
     save_screenshot(snapshot_id, snapshot_url)
 
-    Logger.debug(
-      "ScreenshotArchiver: Finished creating the screenshot for snapshot #{snapshot_id}"
-    )
+
 
     PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
       snapshot_id: snapshot_id,

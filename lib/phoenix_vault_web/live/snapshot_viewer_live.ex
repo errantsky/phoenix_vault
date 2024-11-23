@@ -19,8 +19,6 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
         _ -> "html"
       end
 
-    Logger.debug("SnapshotViewer mount socket_assigns: #{inspect(socket.assigns, pretty: true)}")
-
     # todo error handling
     snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns.current_user)
 
@@ -108,9 +106,7 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
 
   @impl true
   def handle_event("next", _unsigned_params, socket) do
-    Logger.debug(
-      "Fetching next snapshot after snapshot id: #{socket.assigns.current_snapshot.id}"
-    )
+
 
     with next_snapshot when not is_nil(next_snapshot) <-
            Archive.get_next_snapshot(socket.assigns.current_snapshot) do
@@ -131,9 +127,7 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
 
   @impl true
   def handle_event("prev", _unsigned_params, socket) do
-    Logger.debug(
-      "Fetching previous snapshot after snapshot ID: #{socket.assigns.current_snapshot.id}"
-    )
+
 
     with prev_snapshot when not is_nil(prev_snapshot) <-
            Archive.get_prev_snapshot(socket.assigns.current_snapshot) do

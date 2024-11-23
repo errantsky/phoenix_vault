@@ -11,7 +11,6 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      Logger.info("Socket connected, subscribing to snapshots")
       Phoenix.PubSub.subscribe(PhoenixVault.PubSub, "snapshots")
     end
 
@@ -74,10 +73,8 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
       {:ok, updated_snapshot} ->
         {:noreply, stream_insert(socket, :snapshots, updated_snapshot, limit: @per_page)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        Logger.error(
-          "Index handle_info archiver_update: Failed to update the snapshot #{snapshot.id}: #{inspect(changeset)}"
-        )
+      {:error, %Ecto.Changeset{} = _changeset} ->
+
 
         {:noreply, socket}
     end
@@ -116,26 +113,21 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
         offset: 0
       )
 
-    Logger.debug("index handle_event reset search in progress.")
     {:noreply, assign(socket, :search_query, nil) |> stream(:snapshots, snapshots, reset: true)}
   end
 
   @impl true
   def handle_event("next-page", _, socket) do
-    Logger.debug("Loading next-page: #{socket.assigns.page} + 1")
     {:noreply, paginate_snapshots(socket, socket.assigns.page + 1)}
   end
 
   @impl true
   def handle_event("prev-page", %{"_overran" => true}, socket) do
-    Logger.debug("Loading overran prev-page: #{socket.assigns.page}")
     {:noreply, paginate_snapshots(socket, 1)}
   end
 
   @impl true
   def handle_event("prev-page", _, socket) do
-    Logger.debug("Loading prev-page: #{socket.assigns.page} - 1")
-
     if socket.assigns.page > 1 do
       {:noreply, paginate_snapshots(socket, socket.assigns.page - 1)}
     else
@@ -159,19 +151,13 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
 
   @impl true
   def handle_event("refresh_snapshot", %{"sid" => snapshot_id}, socket) do
-    Logger.debug("Triggering a refresh event.")
-
     snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns[:current_user])
 
     case Archive.refresh_snapshot(snapshot) do
       {:ok, updated_snapshot} ->
         {:noreply, stream_insert(socket, :snapshots, updated_snapshot, limit: @per_page)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        Logger.error(
-          "Index handle_info refresh_snapshot: Failed to update the snapshot #{snapshot.id}: #{inspect(changeset)}"
-        )
-
+      {:error, %Ecto.Changeset{} = _changeset} ->
         {:noreply, socket}
     end
 
@@ -193,8 +179,6 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
 
     case snapshots do
       [] ->
-        Logger.debug("paginate_snapshots hit no posts: #{at} #{at == -1}")
-
         socket
         |> assign(end_of_timeline?: at == -1)
 

@@ -24,8 +24,6 @@ defmodule OpenAIClient do
       {"Authorization", "Bearer #{openai_api_key}"}
     ]
     
-    Logger.debug("OpenAIClient get_embedding query: #{text}")
-    
     {:ok, encoded_list} = Tiktoken.CL100K.encode(text) 
     truncated_token_list = Enum.take(encoded_list, @embedding_max_tokens)
     
@@ -49,13 +47,11 @@ defmodule OpenAIClient do
     {:ok, Jason.decode!(body) |> get_in(["data", Access.at(0), "embedding"])}
   end
 
-  defp handle_response({:ok, %Finch.Response{status: status, body: body}}) do
-    Logger.error("Failed with status: #{status} and body: #{body}")
+  defp handle_response({:ok, %Finch.Response{status: _status, body: body}}) do
     {:error, body}
   end
 
   defp handle_response({:error, reason}) do
-    Logger.error("HTTP request failed: #{inspect(reason)}")
     {:error, reason}
   end
 end

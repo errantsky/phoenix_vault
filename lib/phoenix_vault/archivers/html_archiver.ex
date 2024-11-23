@@ -5,15 +5,11 @@ defmodule PhoenixVault.Archivers.HtmlArchiver do
 
   @impl Worker
   def perform(%Job{args: %{"snapshot_id" => snapshot_id, "snapshot_url" => snapshot_url}}) do
-    Logger.debug("HtmlArchiver: Starting for snapshot #{snapshot_id}")
     
     # todo handle error
     {:ok, body} = archive_as_html(snapshot_id, snapshot_url)
-    Logger.debug("HtmlArchiver: Finished creating the HTML for snapshot #{snapshot_id}")
 
-    Logger.debug("HtmlArchiver: Creating embedding for snapshot #{snapshot_id}")
     {:ok, embedding} = OpenAIClient.get_embedding(body)
-    Logger.debug("HtmlArchiver: Finished creating the embedding for snapshot #{snapshot_id}")
 
     PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
       snapshot_id: snapshot_id,
@@ -25,15 +21,10 @@ defmodule PhoenixVault.Archivers.HtmlArchiver do
 
   defp archive_as_html(snapshot_id, snapshot_url) do
     archive_command =
-      "wget --convert-links --adjust-extension --page-requisites #{snapshot_url} -P #{ArchiverConfig.snapshot_dir(snapshot_id)}"
+      "wget --no-parent --convert-links --adjust-extension --page-requisites --reject=*.js #{snapshot_url} -P #{ArchiverConfig.snapshot_dir(snapshot_id)}"
 
-    Logger.debug("HtmlArchiver: Starting system command to archive HTML")
 
-    {output, exit_status} = System.cmd("sh", ["-c", archive_command])
-
-    Logger.debug(
-      "HtmlArchiver: Finished system command with status #{inspect(exit_status)} and output #{inspect(output)}"
-    )
+    {_output, _exit_status} = System.cmd("sh", ["-c", archive_command])
 
     # Now continue with the rest of the logic
     snapshot_dir = ArchiverConfig.snapshot_dir(snapshot_id)

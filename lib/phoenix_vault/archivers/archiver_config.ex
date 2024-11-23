@@ -5,9 +5,7 @@ defmodule PhoenixVault.Archivers.ArchiverConfig do
   require Logger
 
   def snapshot_dir(id) do
-    path = Path.expand(Integer.to_string(id), Application.get_env(:phoenix_vault, :archive_dir))
-    Logger.debug("snapshot_dir is: #{path}")
-    path
+    Path.expand(Integer.to_string(id), Application.get_env(:phoenix_vault, :archive_dir))
   end
 
   def get_root_domain(url) do

@@ -65,7 +65,6 @@ defmodule PhoenixVaultWeb.SnapshotLive.BulkSnapshotComponent do
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, grouped_snapshots} ->
-        Logger.debug("save_snapshot :new could not insert any new snapshots.")
         {:noreply, assign_form(socket, grouped_snapshots[:error])}
     end
   end
