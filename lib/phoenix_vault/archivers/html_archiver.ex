@@ -1,5 +1,5 @@
 defmodule PhoenixVault.Archivers.HtmlArchiver do
-  use Oban.Worker
+  use Oban.Worker, max_attempts: 3
   require Logger
   alias PhoenixVault.Archivers.ArchiverConfig
 
