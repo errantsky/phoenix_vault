@@ -106,7 +106,7 @@ defmodule PhoenixVault.Archive do
       {:error, ...}
 
   """
-  def create_snapshot(attrs \\ %{}, current_user, delay_archiving \\ false) do
+  def create_snapshot(attrs \\ %{}, current_user) do
     # Process the snapshot creation logic
     tags =
       case attrs["tags"] do
@@ -129,7 +129,7 @@ defmodule PhoenixVault.Archive do
     |> Repo.insert()
     |> case do
       {:ok, snapshot} ->
-        if delay_archiving || Application.get_env(:phoenix_vault, :archiver_enabled) != "true" do
+        if Application.get_env(:phoenix_vault, :archiver_enabled) != true do
           {:ok, snapshot}
         else
           Ecto.Multi.new()
