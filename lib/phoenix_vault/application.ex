@@ -30,7 +30,7 @@ defmodule PhoenixVault.Application do
   end
 
   defp chromic_pdf_opts() do
-    [disable_scripts: true, offline: true, on_demand: true]
+    [disable_scripts: true, on_demand: true]
   end
 
   # Tell Phoenix to update the endpoint configuration

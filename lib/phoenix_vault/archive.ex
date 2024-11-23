@@ -5,6 +5,7 @@ defmodule PhoenixVault.Archive do
 
   import Ecto.Query, warn: false
   require Logger
+  alias PhoenixVault.Archivers.ArchiverConfig
   alias PhoenixVault.Archivers
   alias Ecto.Changeset
   alias PhoenixVault.Schemas.Tag
@@ -22,7 +23,7 @@ defmodule PhoenixVault.Archive do
   def snapshot_table_overfetch_factor do
     @overfetch_factor
   end
-
+  
   @doc """
   Returns a page's worth of snapshots. Used in the index LiveView's infinite snapshots stream.
   """
@@ -172,8 +173,8 @@ defmodule PhoenixVault.Archive do
 
   """
   def refresh_snapshot(snapshot) do
-    File.rm_rf!(Archivers.ArchiverConfig.snapshot_dir(snapshot.id))
-
+    wipe_archives(snapshot)
+    
     # reset archive icons
     case update_snapshot(snapshot, %{
            is_screenshot_saved: false,
@@ -327,7 +328,7 @@ defmodule PhoenixVault.Archive do
 
   """
   def delete_snapshot(%Snapshot{} = snapshot) do
-    File.rm_rf!(Archivers.ArchiverConfig.snapshot_dir(snapshot.id))
+    wipe_archives(snapshot)
     Repo.delete(snapshot)
   end
 
@@ -351,5 +352,15 @@ defmodule PhoenixVault.Archive do
       end
 
     Snapshot.changeset(snapshot, attrs)
+  end
+  
+  defp wipe_archives(snapshot) do
+    snapshot_jobs = from j in Oban.Job,
+      where: like(j.worker, "PhoenixVault.Archivers.%") and j.args["snapshot_id"] == ^snapshot.id
+      
+    snapshot_jobs
+      |> Oban.cancel_all_jobs()
+    
+    File.rm_rf!(ArchiverConfig.snapshot_dir(snapshot.id))
   end
 end
