@@ -20,7 +20,7 @@ defmodule PhoenixVault.Archivers.SingleFileArchiver do
     snapshot_dir = ArchiverConfig.snapshot_dir(snapshot_id)
     index_html_path = Path.join([snapshot_dir, "#{snapshot_id}.html"])
 
-    command = "./bin/single-file-m #{snapshot_url} #{index_html_path}"
+    command = "#{select_binary()} #{snapshot_url} #{index_html_path}"
 
     dbg(command)
 
@@ -35,4 +35,12 @@ defmodule PhoenixVault.Archivers.SingleFileArchiver do
     body = Floki.find(document, "body")
     {:ok, Floki.raw_html(body)}
   end
+  
+  defp select_binary do
+      case :os.type() do
+        {:unix, :darwin} -> "./bin/single-file-aarch64-apple-darwin"
+        {:unix, _} -> "./bin/single-file-x86_64-linux"
+        _ -> raise "Unsupported operating system"
+      end
+    end
 end
