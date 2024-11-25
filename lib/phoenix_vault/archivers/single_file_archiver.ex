@@ -1,9 +1,10 @@
-defmodule SingleFileArchiver do
+defmodule PhoenixVault.Archivers.SingleFileArchiver do
+  alias PhoenixVault.Archivers.ArchiverConfig
   use Oban.Worker, max_attempts: 3
 
   @impl Worker
   def perform(%Job{args: %{"snapshot_id" => snapshot_id, "snapshot_url" => snapshot_url}}) do
-    {:ok, _ret} = archive_as_single_file(snapshot_id, snapshot_url)
+    {:ok, body} = archive_as_single_file(snapshot_id, snapshot_url)
 
     {:ok, embedding} = OpenAIClient.get_embedding(body)
 
@@ -17,21 +18,21 @@ defmodule SingleFileArchiver do
 
   defp archive_as_single_file(snapshot_id, snapshot_url) do
     snapshot_dir = ArchiverConfig.snapshot_dir(snapshot_id)
-    index_html_path = Path.join([snapshot_dir, snapshot_id])
+    index_html_path = Path.join([snapshot_dir, "#{snapshot_id}.html"])
 
-    command = """
-      ./singlefile #{snapshot_url} #{index_html_path}
-    """
+    command = "./bin/single-file-m #{snapshot_url} #{index_html_path}"
 
-    [_output, _exit_status] = System.cmd("sh", ["-c", command])
+    dbg(command)
+
+    {_output, _exit_status} = System.cmd("sh", ["-c", command])
 
     # todo add error handling
-    {:ok, html} = File.read(Path.join([index_html_path, snapshot_id <> ".html"])
+    File.read!(index_html_path) |> extract_body()
   end
 
-  defp find_index_html(snapshot_dir) do
-    # todo simplify
-    Path.wildcard(Path.join([snapshot_dir, "**", "index.html"]))
-    |> List.first()
+  defp extract_body(html) do
+    {:ok, document} = Floki.parse_document(html)
+    body = Floki.find(document, "body")
+    {:ok, Floki.raw_html(body)}
   end
 end
