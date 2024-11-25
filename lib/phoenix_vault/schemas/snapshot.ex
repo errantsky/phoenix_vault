@@ -10,6 +10,7 @@ defmodule PhoenixVault.Schemas.Snapshot do
     field :is_html_saved, :boolean, default: false
     field :is_screenshot_saved, :boolean, default: false
     field :is_pdf_saved, :boolean, default: false
+    field :is_single_file_saved, :boolean, default: false
     field :user_id, :integer
     field :embedding, Pgvector.Ecto.Vector
     
@@ -25,7 +26,7 @@ defmodule PhoenixVault.Schemas.Snapshot do
     # TODO validate url
     # TODO validate tags
     snapshot
-    |> cast(attrs, [:title, :url, :user_id, :is_pdf_saved, :is_screenshot_saved, :is_html_saved, :embedding])
+    |> cast(attrs, [:title, :url, :user_id, :is_pdf_saved, :is_screenshot_saved, :is_html_saved, :is_single_file_saved, :embedding])
     |> validate_required([:title, :url, :user_id])
     |> unique_constraint(:url)
     |> put_assoc(:tags, Map.get(attrs, "tags", []))

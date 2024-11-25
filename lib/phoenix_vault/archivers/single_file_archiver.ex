@@ -10,7 +10,7 @@ defmodule PhoenixVault.Archivers.SingleFileArchiver do
 
     PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
       snapshot_id: snapshot_id,
-      update_columns: %{is_single_file_saved: true, embedding: embedding}
+      updated_columns: %{is_single_file_saved: true, embedding: embedding}
     })
 
     {:ok, snapshot_id}

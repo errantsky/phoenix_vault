@@ -143,6 +143,10 @@ defmodule PhoenixVault.Archive do
             Archivers.HtmlArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
           )
           |> Oban.insert(
+            "single-file-archiver-#{snapshot.id}",
+            Archivers.SingleFileArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
+          )
+          |> Oban.insert(
             "screenshot-archiver-#{snapshot.id}",
             Archivers.ScreenshotArchiver.new(%{
               snapshot_id: snapshot.id,
@@ -179,7 +183,8 @@ defmodule PhoenixVault.Archive do
     case update_snapshot(snapshot, %{
            is_screenshot_saved: false,
            is_pdf_saved: false,
-           is_html_saved: false
+           is_html_saved: false,
+           is_single_file_saved: false,
          }) do
       {:ok, updated_snapshot} ->
         Ecto.Multi.new()
@@ -193,6 +198,13 @@ defmodule PhoenixVault.Archive do
         |> Oban.insert(
           "html-archiver-#{updated_snapshot.id}",
           Archivers.HtmlArchiver.new(%{
+            snapshot_id: updated_snapshot.id,
+            snapshot_url: updated_snapshot.url
+          })
+        )
+        |> Oban.insert(
+          "single-file-archiver-#{updated_snapshot.id}",
+          Archivers.SingleFileArchiver.new(%{
             snapshot_id: updated_snapshot.id,
             snapshot_url: updated_snapshot.url
           })
