@@ -1,4 +1,5 @@
 # PhoenixVault
+![4551B927-3A4B-4D5F-8108-CF61E283E91F_1_105_c](https://github.com/user-attachments/assets/c06c194a-8280-4946-9816-986100c79b52)
 
 A partial clone of [Archivebox](https://github.com/ArchiveBox/ArchiveBox) implemented in Elixir using Phoenix LiveView & PostgreSQL.
 
