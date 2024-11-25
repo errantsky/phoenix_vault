@@ -14,9 +14,8 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
       case Map.get(params, "selected_source") do
         "pdf" -> "pdf"
         "screenshot" -> "screenshot"
-        "html" -> "html"
-        # default to "html" if the value is not valid
-        _ -> "html"
+        "single-file" -> "single-file"
+        _ -> "single-file"
       end
 
     # todo error handling
@@ -41,14 +40,14 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
         )
       )
       |> assign(
-        :html_path,
+        :single_file_path,
         static_path(
           socket,
           Path.join([
             "/archive",
             to_string(snapshot.id),
             ArchiverConfig.get_root_domain(snapshot.url),
-            "index.html"
+            "#{snapshot.id}.html"
           ])
         )
       )
@@ -62,14 +61,15 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
       case Map.get(params, "selected_source") do
         "pdf" -> "pdf"
         "screenshot" -> "screenshot"
-        "html" -> "html"
-        # default to "html" if the value is not valid
-        _ -> "html"
+        "single-file" -> "single-file"
+        # default to "single-file" if the value is not valid
+        _ -> "single-file"
       end
 
     # todo error handling
     snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns.current_user)
 
+    # todo refactor path finder
     socket =
       socket
       |> assign(:current_snapshot, snapshot)
@@ -89,14 +89,13 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
         )
       )
       |> assign(
-        :html_path,
+        :single_file_path,
         static_path(
           socket,
           Path.join([
             "/archive",
             to_string(snapshot.id),
-            ArchiverConfig.get_root_domain(snapshot.url),
-            "index.html"
+            "#{snapshot.id}.html"
           ])
         )
       )
@@ -177,7 +176,7 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
   end
 
   @impl true
-  def handle_event("html", _unsigned_params, socket) do
+  def handle_event("single-file", _unsigned_params, socket) do
     {:noreply,
      push_patch(socket,
        to: ~p"/snapshots/view/#{socket.assigns.current_snapshot.id}?selected_source=html"

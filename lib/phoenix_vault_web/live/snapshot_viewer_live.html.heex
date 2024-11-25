@@ -26,6 +26,14 @@
 <div class="snapshot-container" style="border: 1px solid black; padding: 16px; margin: 16px;">
   <div class="source-selector">
     <.button
+      phx-click="single-file"
+      class={if @selected_source == "single-file", do: "btn-selected", else: "btn-not-selected"}
+      disabled={@selected_source == "single-file"}
+    >
+      Single File
+    </.button>
+    |
+    <.button
       phx-click="screenshot"
       class={if @selected_source == "screenshot", do: "btn-selected", else: "btn-not-selected"}
       disabled={@selected_source == "screenshot"}
@@ -40,24 +48,17 @@
     >
       PDF
     </.button>
-    |
-    <.button
-      phx-click="html"
-      class={if @selected_source == "html", do: "btn-selected", else: "btn-not-selected"}
-      disabled={@selected_source == "html"}
-    >
-      HTML
-    </.button>
   </div>
 
   <div class="snapshot-content">
     <%= case @selected_source do %>
+      <% "single-file" -> %>
+        <!-- Embed HTML here -->
+        <iframe src={@single_file_path} style="width: 100%; height: 2000px; border: none;">
+        </iframe>
       <% "screenshot" -> %>
         <!-- Display screenshot as an image -->
         <img src={@screenshot_path} alt="Snapshot Screenshot" style="width: 100%; height: auto;" />
-      <% "html" -> %>
-        <!-- Embed HTML here -->
-        <iframe src={@html_path} style="width: 100%; height: 2000px; border: none;"></iframe>
       <% "pdf" -> %>
         <!-- Embed PDF with pagination controls -->
         <div class="pdf-controls mb-4 flex justify-between items-center">

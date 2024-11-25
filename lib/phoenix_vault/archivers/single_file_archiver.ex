@@ -22,10 +22,9 @@ defmodule PhoenixVault.Archivers.SingleFileArchiver do
 
     command = "#{select_binary()} #{snapshot_url} #{index_html_path}"
 
-    dbg(command)
+
 
     {_output, _exit_status} = System.cmd("sh", ["-c", command])
-
     # todo add error handling
     File.read!(index_html_path) |> extract_body()
   end
