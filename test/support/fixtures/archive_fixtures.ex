@@ -26,7 +26,7 @@ defmodule PhoenixVault.ArchiveFixtures do
     {:ok, snapshot} =
       attrs
       |> Enum.into(%{})
-      |> PhoenixVault.Archive.create_snapshot(user, true)
+      |> PhoenixVault.Archive.create_snapshot(user)
 
     snapshot
   end

@@ -28,11 +28,11 @@ defmodule PhoenixVault.ArchiveTest do
     test "create_snapshot/1 with valid data creates a snapshot", %{user: user} do
       valid_attrs = %{"title" => "sample", "url" => "https://example.com"}
 
-      assert {:ok, %Snapshot{}} = Archive.create_snapshot(valid_attrs, user, true)
+      assert {:ok, %Snapshot{}} = Archive.create_snapshot(valid_attrs, user)
     end
 
     test "create_snapshot/1 with invalid data returns error changeset", %{user: user} do
-      assert {:error, %Ecto.Changeset{}} = Archive.create_snapshot(@invalid_attrs, user, true)
+      assert {:error, %Ecto.Changeset{}} = Archive.create_snapshot(@invalid_attrs, user)
     end
 
     test "update_snapshot/2 with valid data updates the snapshot", %{user: user} do

@@ -23,7 +23,7 @@ defmodule PhoenixVault.Archive do
   def snapshot_table_overfetch_factor do
     @overfetch_factor
   end
-  
+
   @doc """
   Returns a page's worth of snapshots. Used in the index LiveView's infinite snapshots stream.
   """
@@ -130,34 +130,7 @@ defmodule PhoenixVault.Archive do
     |> Repo.insert()
     |> case do
       {:ok, snapshot} ->
-        if Application.get_env(:phoenix_vault, :archiver_enabled) != true do
-          {:ok, snapshot}
-        else
-          Ecto.Multi.new()
-          |> Oban.insert(
-            "pdf-archiver-#{snapshot.id}",
-            Archivers.PdfArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
-          )
-          |> Oban.insert(
-            "html-archiver-#{snapshot.id}",
-            Archivers.HtmlArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
-          )
-          |> Oban.insert(
-            "single-file-archiver-#{snapshot.id}",
-            Archivers.SingleFileArchiver.new(%{snapshot_id: snapshot.id, snapshot_url: snapshot.url})
-          )
-          |> Oban.insert(
-            "screenshot-archiver-#{snapshot.id}",
-            Archivers.ScreenshotArchiver.new(%{
-              snapshot_id: snapshot.id,
-              snapshot_url: snapshot.url
-            })
-          )
-          |> PhoenixVault.Repo.transaction()
-
-          # Return the created snapshot, immediately responding to the API request
-          {:ok, snapshot}
-        end
+        queue_archiver_jobs(snapshot)
 
       {:error, changeset} ->
         {:error, changeset}
@@ -178,47 +151,15 @@ defmodule PhoenixVault.Archive do
   """
   def refresh_snapshot(snapshot) do
     wipe_archives(snapshot)
-    
+
     # reset archive icons
     case update_snapshot(snapshot, %{
            is_screenshot_saved: false,
            is_pdf_saved: false,
-           is_html_saved: false,
-           is_single_file_saved: false,
+           is_single_file_saved: false
          }) do
       {:ok, updated_snapshot} ->
-        Ecto.Multi.new()
-        |> Oban.insert(
-          "pdf-archiver-#{updated_snapshot.id}",
-          Archivers.PdfArchiver.new(%{
-            snapshot_id: updated_snapshot.id,
-            snapshot_url: updated_snapshot.url
-          })
-        )
-        |> Oban.insert(
-          "html-archiver-#{updated_snapshot.id}",
-          Archivers.HtmlArchiver.new(%{
-            snapshot_id: updated_snapshot.id,
-            snapshot_url: updated_snapshot.url
-          })
-        )
-        |> Oban.insert(
-          "single-file-archiver-#{updated_snapshot.id}",
-          Archivers.SingleFileArchiver.new(%{
-            snapshot_id: updated_snapshot.id,
-            snapshot_url: updated_snapshot.url
-          })
-        )
-        |> Oban.insert(
-          "screenshot-archiver-#{snapshot.id}",
-          Archivers.ScreenshotArchiver.new(%{
-            snapshot_id: updated_snapshot.id,
-            snapshot_url: updated_snapshot.url
-          })
-        )
-        |> PhoenixVault.Repo.transaction()
-
-        {:ok, updated_snapshot}
+        queue_archiver_jobs(updated_snapshot)
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, changeset}
@@ -365,14 +306,48 @@ defmodule PhoenixVault.Archive do
 
     Snapshot.changeset(snapshot, attrs)
   end
-  
+
   defp wipe_archives(snapshot) do
-    snapshot_jobs = from j in Oban.Job,
-      where: like(j.worker, "PhoenixVault.Archivers.%") and j.args["snapshot_id"] == ^snapshot.id
-      
+    snapshot_jobs =
+      from j in Oban.Job,
+        where:
+          like(j.worker, "PhoenixVault.Archivers.%") and j.args["snapshot_id"] == ^snapshot.id
+
     snapshot_jobs
-      |> Oban.cancel_all_jobs()
-    
+    |> Oban.cancel_all_jobs()
+
     File.rm_rf!(ArchiverConfig.snapshot_dir(snapshot.id))
+  end
+
+  defp queue_archiver_jobs(updated_snapshot) do
+    if Application.get_env(:phoenix_vault, :archiver_enabled) != true do
+      {:ok, updated_snapshot}
+    else
+      Ecto.Multi.new()
+      |> Oban.insert(
+        "pdf-archiver-#{updated_snapshot.id}",
+        Archivers.PdfArchiver.new(%{
+          snapshot_id: updated_snapshot.id,
+          snapshot_url: updated_snapshot.url
+        })
+      )
+      |> Oban.insert(
+        "single-file-archiver-#{updated_snapshot.id}",
+        Archivers.SingleFileArchiver.new(%{
+          snapshot_id: updated_snapshot.id,
+          snapshot_url: updated_snapshot.url
+        })
+      )
+      |> Oban.insert(
+        "screenshot-archiver-#{updated_snapshot.id}",
+        Archivers.ScreenshotArchiver.new(%{
+          snapshot_id: updated_snapshot.id,
+          snapshot_url: updated_snapshot.url
+        })
+      )
+      |> PhoenixVault.Repo.transaction()
+
+      {:ok, updated_snapshot}
+    end
   end
 end

@@ -16,7 +16,7 @@
     placeholder="Type '/' to search"
     value={@search_query || ""}
   />
-  <.button type="submit" class="ml-3" >Search</.button>
+  <.button type="submit" class="ml-3">Search</.button>
   <%= if @search_query && @search_query != "" do %>
     <.button type="button" phx-click="reset_search" class="ml-3 reset-button">✖</.button>
   <% end %>
@@ -33,29 +33,45 @@
       <%= snapshot.title %>
     </.link>
   </:col>
+
   <:col :let={{_id, snapshot}} label="URL">
     <.link href={snapshot.url} target="_blank" rel="noopener noreferrer">
       <%= snapshot.url %>
     </.link>
   </:col>
+
   <:col :let={{_id, snapshot}} label="Tags">
     <%= Enum.map(snapshot.tags, fn tag -> tag.name end)
     |> Enum.join(", ") %>
   </:col>
+
   <:col :let={{_id, snapshot}} label="Inserted at">
     <%= snapshot.inserted_at %>
   </:col>
+
   <:col :let={{_id, snapshot}} label="Updated at">
     <%= snapshot.updated_at %>
   </:col>
+
   <:col :let={{_id, snapshot}} label="User ID">
     <%= snapshot.user_id %>
   </:col>
+
+  <:col :let={{_id, snapshot}} label="SingleFile Saved">
+    <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=single-file"}>
+      <%= if snapshot.is_single_file_saved do %>
+        <.icon name="hero-check-circle-micro" class="w-6 h-6 bg-green-600" />
+      <% else %>
+        <.icon name="hero-x-circle-micro" class="w-6 h-6 bg-red-600" />
+      <% end %>
+    </.link>
+  </:col>
+
   <:col :let={{_id, snapshot}} label="Screenshot Saved">
     <%!-- todo switch patch to proper params: <.link patch={path(~p"/users", sort_by: "name")}>Sort by name</.link> --%>
     <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=screenshot"}>
       <%= if snapshot.is_screenshot_saved do %>
-        <.icon name="hero-check-circle-micro" class="w-6 h-6 bg-green-600"/>
+        <.icon name="hero-check-circle-micro" class="w-6 h-6 bg-green-600" />
       <% else %>
         <.icon name="hero-x-circle-micro" class="w-6 h-6 bg-red-600" />
       <% end %>
@@ -71,26 +87,7 @@
       <% end %>
     </.link>
   </:col>
-  <:col :let={{_id, snapshot}} label="HTML Saved">
-    <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=html"}>
-      <%= if snapshot.is_html_saved do %>
-        <.icon name="hero-check-circle-micro" class="w-6 h-6 bg-green-600" />
-      <% else %>
-        <.icon name="hero-x-circle-micro" class="w-6 h-6 bg-red-600" />
-      <% end %>
-    </.link>
-  </:col>
-  
-  <:col :let={{_id, snapshot}} label="SingleFile Saved">
-    <.link patch={~p"/snapshots/view/#{snapshot.id}?selected_source=single-file"}>
-      <%= if snapshot.is_single_file_saved do %>
-        <.icon name="hero-check-circle-micro" class="w-6 h-6 bg-green-600" />
-      <% else %>
-        <.icon name="hero-x-circle-micro" class="w-6 h-6 bg-red-600" />
-      <% end %>
-    </.link>
-  </:col>
-  
+
   <:col :let={{_id, snapshot}} label="Re-snapshot">
     <.link phx-click="refresh_snapshot" phx-value-sid={snapshot.id}>
       <.icon name="hero-arrow-path-micro" class="w-6 h-6 bg-green-600" />
