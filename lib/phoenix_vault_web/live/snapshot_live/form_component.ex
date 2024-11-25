@@ -20,12 +20,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
         <:subtitle>Use this form to manage snapshot records in your database.</:subtitle>
       </.header>
 
-      <.simple_form
-        for={@form}
-        id="snapshot-form"
-        phx-target={@myself}
-        phx-submit="save"
-      >
+      <.simple_form for={@form} id="snapshot-form" phx-target={@myself} phx-submit="save">
         <.input field={@form[:title]} label="Title" type="text" required />
         <.input field={@form[:url]} label="URL" type="text" required />
         <.input field={@form[:tags]} label="Tags" type="text" value={@tag_names} />
@@ -80,20 +75,19 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
     case {action, Archive.create_snapshot(snapshot_params, socket.assigns[:current_user])} do
       {:new, {:ok, snapshot}} ->
         notify_parent({:saved, snapshot})
-  
+
         {:noreply,
          socket
          |> put_flash(:info, "Snapshot created successfully")
          |> push_patch(to: socket.assigns.patch)}
-  
+
       {:new, {:error, changeset}} ->
         {:noreply, assign_form(socket, changeset)}
-  
+
       {_, _} ->
         {:noreply, socket}
     end
   end
-
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     assign(socket, :form, to_form(changeset))

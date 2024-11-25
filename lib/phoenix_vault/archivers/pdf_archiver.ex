@@ -5,7 +5,6 @@ defmodule PhoenixVault.Archivers.PdfArchiver do
 
   @impl Worker
   def perform(%Job{args: %{"snapshot_id" => snapshot_id, "snapshot_url" => snapshot_url}}) do
-
     # todo add error handling
     print_pdf_for_url(snapshot_id, snapshot_url)
 

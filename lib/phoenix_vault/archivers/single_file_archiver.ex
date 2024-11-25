@@ -22,8 +22,6 @@ defmodule PhoenixVault.Archivers.SingleFileArchiver do
 
     command = "#{select_binary()} #{snapshot_url} #{index_html_path}"
 
-
-
     {_output, _exit_status} = System.cmd("sh", ["-c", command])
     # todo add error handling
     File.read!(index_html_path) |> extract_body()
@@ -34,12 +32,12 @@ defmodule PhoenixVault.Archivers.SingleFileArchiver do
     body = Floki.find(document, "body")
     {:ok, Floki.raw_html(body)}
   end
-  
+
   defp select_binary do
-      case :os.type() do
-        {:unix, :darwin} -> "./bin/single-file-aarch64-apple-darwin"
-        {:unix, _} -> "./bin/single-file-x86_64-linux"
-        _ -> raise "Unsupported operating system"
-      end
+    case :os.type() do
+      {:unix, :darwin} -> "./bin/single-file-aarch64-apple-darwin"
+      {:unix, _} -> "./bin/single-file-x86_64-linux"
+      _ -> raise "Unsupported operating system"
     end
+  end
 end

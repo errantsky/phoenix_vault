@@ -22,6 +22,7 @@ defmodule EmbeddingSearch do
         where: s.user_id == ^user_id,
         order_by: cosine_distance(s.embedding, ^snapshot_embedding),
         limit: ^limit
-    ) |> Repo.preload(:tags)
+    )
+    |> Repo.preload(:tags)
   end
 end

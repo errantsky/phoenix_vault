@@ -14,12 +14,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.BulkSnapshotComponent do
         <:subtitle>Use this form to bulk create snapshot records in your database.</:subtitle>
       </.header>
 
-      <.simple_form
-        for={@form}
-        id="bulk-snapshot-form"
-        phx-target={@myself}
-        phx-submit="bulk_save"
-      >
+      <.simple_form for={@form} id="bulk-snapshot-form" phx-target={@myself} phx-submit="bulk_save">
         <.input field={@form[:urls]} label="URLs" type="textarea" required />
         <:actions>
           <.button phx-disable-with="Saving...">Save Snapshots</.button>

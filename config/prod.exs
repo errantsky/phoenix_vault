@@ -1,6 +1,5 @@
 import Config
 
-
 config :phoenix_vault,
        :archiver_enabled,
        true

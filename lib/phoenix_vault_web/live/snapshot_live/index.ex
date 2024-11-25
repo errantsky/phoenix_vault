@@ -74,8 +74,6 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
         {:noreply, stream_insert(socket, :snapshots, updated_snapshot, limit: @per_page)}
 
       {:error, %Ecto.Changeset{} = _changeset} ->
-
-
         {:noreply, socket}
     end
   end

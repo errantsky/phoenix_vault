@@ -23,10 +23,10 @@ defmodule OpenAIClient do
       {"Content-Type", "application/json"},
       {"Authorization", "Bearer #{openai_api_key}"}
     ]
-    
-    {:ok, encoded_list} = Tiktoken.CL100K.encode(text) 
+
+    {:ok, encoded_list} = Tiktoken.CL100K.encode(text)
     truncated_token_list = Enum.take(encoded_list, @embedding_max_tokens)
-    
+
     request_body =
       %{
         input: truncated_token_list,

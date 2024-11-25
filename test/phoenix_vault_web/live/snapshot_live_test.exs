@@ -11,16 +11,15 @@ defmodule PhoenixVaultWeb.SnapshotLiveTest do
     snapshot = snapshot_fixture(nil, user)
     %{snapshot: snapshot}
   end
-  
+
   defp register_and_login(%{conn: conn}) do
     %{conn: _conn, user: _user} = register_and_log_in_user(%{conn: conn})
   end
-  
+
   describe "Index" do
     setup [:register_and_login, :create_snapshot]
 
     test "lists all snapshots", %{conn: conn} do
-      
       {:ok, _index_live, html} = live(conn, ~p"/snapshots")
 
       assert html =~ "Listing Snapshots"

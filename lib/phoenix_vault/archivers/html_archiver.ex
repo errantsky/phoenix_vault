@@ -5,7 +5,6 @@ defmodule PhoenixVault.Archivers.HtmlArchiver do
 
   @impl Worker
   def perform(%Job{args: %{"snapshot_id" => snapshot_id, "snapshot_url" => snapshot_url}}) do
-    
     # todo handle error
     {:ok, body} = archive_as_html(snapshot_id, snapshot_url)
 
@@ -22,7 +21,6 @@ defmodule PhoenixVault.Archivers.HtmlArchiver do
   defp archive_as_html(snapshot_id, snapshot_url) do
     archive_command =
       "wget --no-parent --adjust-extension --page-requisites --reject=*.js #{snapshot_url} -P #{ArchiverConfig.snapshot_dir(snapshot_id)}"
-
 
     {_output, _exit_status} = System.cmd("sh", ["-c", archive_command])
 

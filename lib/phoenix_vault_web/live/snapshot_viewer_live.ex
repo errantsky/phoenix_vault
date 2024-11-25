@@ -105,8 +105,6 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
 
   @impl true
   def handle_event("next", _unsigned_params, socket) do
-
-
     with next_snapshot when not is_nil(next_snapshot) <-
            Archive.get_next_snapshot(socket.assigns.current_snapshot) do
       query_params =
@@ -126,8 +124,6 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
 
   @impl true
   def handle_event("prev", _unsigned_params, socket) do
-
-
     with prev_snapshot when not is_nil(prev_snapshot) <-
            Archive.get_prev_snapshot(socket.assigns.current_snapshot) do
       query_params =
@@ -144,7 +140,7 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
       _ -> {:noreply, socket}
     end
   end
-  
+
   @impl true
   def handle_event("navigate-snapshot", %{"key" => key} = params, socket) do
     case key do
@@ -153,7 +149,7 @@ defmodule PhoenixVaultWeb.SnapshotViewerLive do
       _ -> {:noreply, socket}
     end
   end
-  
+
   @impl true
   def handle_event("navigate-snapshot", _, socket) do
     {:noreply, socket}

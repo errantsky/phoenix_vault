@@ -25,12 +25,12 @@ defmodule PhoenixVaultWeb.Router do
 
       live "/snapshots/:id", SnapshotLive.Show, :show
       live "/snapshots/:id/show/edit", SnapshotLive.Show, :edit
-      
+
       # viewer routes
       live "/snapshots/view/:id/", SnapshotViewerLive, :show
     end
   end
-  
+
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:phoenix_vault, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put

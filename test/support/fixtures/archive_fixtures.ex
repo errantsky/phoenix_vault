@@ -15,13 +15,14 @@ defmodule PhoenixVault.ArchiveFixtures do
       else
         user
       end
-      
-    attrs = if is_nil(attrs) do
-      %{
-        "title" => "sample",
-        "url" => "https://example.com"
-      }
-    end
+
+    attrs =
+      if is_nil(attrs) do
+        %{
+          "title" => "sample",
+          "url" => "https://example.com"
+        }
+      end
 
     {:ok, snapshot} =
       attrs
