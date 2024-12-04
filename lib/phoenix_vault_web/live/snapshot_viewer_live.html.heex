@@ -19,7 +19,7 @@
   style="margin-top: 16px; display: flex; justify-content: space-between;"
 >
   <.button phx-click="prev">>Previous</.button>
-  <a href={@current_snapshot.url} style="color: blue;">Snapshot URL</a>
+  <a href={@current_snapshot.url} class="text-blue-600">Snapshot URL</a>
   <.button phx-click="next">>Next</.button>
 </div>
 
@@ -60,6 +60,7 @@
         <!-- Display screenshot as an image -->
         <img src={@screenshot_path} alt="Snapshot Screenshot" style="width: 100%; height: auto;" />
       <% "pdf" -> %>
+        <a class="flex text-blue-600 justify-self-center p-2" href={@pdf_path}  target="_blank" rel="noopener noreferrer">PDF File</a>
         <!-- Embed PDF with pagination controls -->
         <div class="pdf-controls mb-4 flex justify-between items-center">
           <button id="prev" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
