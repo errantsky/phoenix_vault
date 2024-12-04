@@ -1,20 +1,29 @@
 defmodule PhoenixVault.Archivers.SingleFileArchiver do
   alias PhoenixVault.Archivers.ArchiverConfig
+  alias PhoenixVault.Schemas.Snapshot
+  alias PhoenixVault.Repo
+  import Ecto.Query
+
   use Oban.Worker, max_attempts: 3
 
   @impl Worker
   def perform(%Job{args: %{"snapshot_id" => snapshot_id, "snapshot_url" => snapshot_url}}) do
     {:ok, body} = archive_as_single_file(snapshot_id, snapshot_url)
-    
+
     summary = Readability.article(body)
       |> Readability.readable_text
-      |> dbg()
 
     {:ok, embedding} = OpenAIClient.get_embedding(summary)
 
+    from(
+      s in Snapshot,
+      where: s.id == ^snapshot_id,
+      update: [set: [is_single_file_saved: true, embedding: ^embedding]]
+    )
+      |> Repo.update_all([])
+
     PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
-      snapshot_id: snapshot_id,
-      updated_columns: %{is_single_file_saved: true, embedding: embedding}
+      snapshot_id: snapshot_id
     })
 
     {:ok, snapshot_id}

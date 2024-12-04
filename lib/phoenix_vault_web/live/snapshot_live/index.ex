@@ -63,19 +63,14 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
         %Phoenix.Socket.Broadcast{
           topic: "snapshots",
           event: "archiver_update",
-          payload: %{snapshot_id: snapshot_id, updated_columns: updated_columns}
+          payload: %{snapshot_id: snapshot_id}
         },
         socket
       ) do
+        
     snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns.current_user)
-
-    case Archive.update_snapshot(snapshot, updated_columns) do
-      {:ok, updated_snapshot} ->
-        {:noreply, stream_insert(socket, :snapshots, updated_snapshot, limit: @per_page)}
-
-      {:error, %Ecto.Changeset{} = _changeset} ->
-        {:noreply, socket}
-    end
+    
+    {:noreply, stream_insert(socket, :snapshots, snapshot, limit: @per_page)}
   end
 
   @impl true
