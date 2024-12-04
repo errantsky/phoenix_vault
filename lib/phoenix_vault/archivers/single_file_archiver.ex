@@ -5,8 +5,12 @@ defmodule PhoenixVault.Archivers.SingleFileArchiver do
   @impl Worker
   def perform(%Job{args: %{"snapshot_id" => snapshot_id, "snapshot_url" => snapshot_url}}) do
     {:ok, body} = archive_as_single_file(snapshot_id, snapshot_url)
+    
+    summary = Readability.article(body)
+      |> Readability.readable_text
+      |> dbg()
 
-    {:ok, embedding} = OpenAIClient.get_embedding(body)
+    {:ok, embedding} = OpenAIClient.get_embedding(summary)
 
     PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
       snapshot_id: snapshot_id,
