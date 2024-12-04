@@ -39,7 +39,7 @@ defmodule PhoenixVault.MixProject do
       {:postgrex, "~> 0.19.3"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.5", only: :dev},
-      {:phoenix_live_view, "~> 1.0.0-rc.1", override: true},
+      {:phoenix_live_view, "~> 1.0.0", override: true},
       {:floki, ">= 0.36.3"},
       {:phoenix_live_dashboard, "~> 0.8"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
