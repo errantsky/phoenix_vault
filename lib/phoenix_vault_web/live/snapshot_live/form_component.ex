@@ -16,7 +16,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.FormComponent do
     ~H"""
     <div>
       <.header>
-        <%= @title %>
+        {@title}
         <:subtitle>Use this form to manage snapshot records in your database.</:subtitle>
       </.header>
 

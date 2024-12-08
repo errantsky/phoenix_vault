@@ -13,9 +13,9 @@ defmodule PhoenixVault.Archivers.ScreenshotArchiver do
     from(
       s in Snapshot,
       where: s.id == ^snapshot_id,
-      update: [set: [is_screenshot_saved: true,]]
+      update: [set: [is_screenshot_saved: true]]
     )
-      |> Repo.update_all([])
+    |> Repo.update_all([])
 
     PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
       snapshot_id: snapshot_id

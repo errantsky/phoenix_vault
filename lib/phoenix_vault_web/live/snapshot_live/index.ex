@@ -67,9 +67,8 @@ defmodule PhoenixVaultWeb.SnapshotLive.Index do
         },
         socket
       ) do
-        
     snapshot = Archive.get_snapshot!(snapshot_id, socket.assigns.current_user)
-    
+
     {:noreply, stream_insert(socket, :snapshots, snapshot, limit: @per_page)}
   end
 

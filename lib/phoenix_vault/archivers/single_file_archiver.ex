@@ -10,8 +10,9 @@ defmodule PhoenixVault.Archivers.SingleFileArchiver do
   def perform(%Job{args: %{"snapshot_id" => snapshot_id, "snapshot_url" => snapshot_url}}) do
     {:ok, body} = archive_as_single_file(snapshot_id, snapshot_url)
 
-    summary = Readability.article(body)
-      |> Readability.readable_text
+    summary =
+      Readability.article(body)
+      |> Readability.readable_text()
 
     {:ok, embedding} = OpenAIClient.get_embedding(summary)
 
@@ -20,7 +21,7 @@ defmodule PhoenixVault.Archivers.SingleFileArchiver do
       where: s.id == ^snapshot_id,
       update: [set: [is_single_file_saved: true, embedding: ^embedding]]
     )
-      |> Repo.update_all([])
+    |> Repo.update_all([])
 
     PhoenixVaultWeb.Endpoint.broadcast!("snapshots", "archiver_update", %{
       snapshot_id: snapshot_id

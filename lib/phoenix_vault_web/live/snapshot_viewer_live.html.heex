@@ -8,7 +8,7 @@
 </head>
 
 <.header>
-  Snapshot Viewer for <%= @current_snapshot.id %>
+  Snapshot Viewer for {@current_snapshot.id}
   <:subtitle>This is the archived view of your snapshot.</:subtitle>
 </.header>
 
@@ -60,30 +60,37 @@
         <!-- Display screenshot as an image -->
         <img src={@screenshot_path} alt="Snapshot Screenshot" style="width: 100%; height: auto;" />
       <% "pdf" -> %>
-      <div 
-        id="pdf-viewer" 
-        phx-hook="PdfViewer" 
-        data-pdf-path={@pdf_path} style={if @selected_source == "pdf", do: "display: block;", else: "display: none;"}
+        <div
+          id="pdf-viewer"
+          phx-hook="PdfViewer"
+          data-pdf-path={@pdf_path}
+          style={if @selected_source == "pdf", do: "display: block;", else: "display: none;"}
         >
-        
-        <a class="flex text-blue-600 justify-self-center p-2" href={@pdf_path}  target="_blank" rel="noopener noreferrer">PDF File</a>
-        <!-- Embed PDF with pagination controls -->
-        <div class="pdf-controls mb-4 flex justify-between items-center">
-          <button id="prev" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-            Previous
-          </button>
-          <div>
-            Page: <span id="page_num" class="font-bold">1</span>
-            / <span id="page_count" class="font-bold">1</span>
+          <a
+            class="flex text-blue-600 justify-self-center p-2"
+            href={@pdf_path}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            PDF File
+          </a>
+          <!-- Embed PDF with pagination controls -->
+          <div class="pdf-controls mb-4 flex justify-between items-center">
+            <button id="prev" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              Previous
+            </button>
+            <div>
+              Page: <span id="page_num" class="font-bold">1</span>
+              / <span id="page_count" class="font-bold">1</span>
+            </div>
+            <button id="next" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              Next
+            </button>
           </div>
-          <button id="next" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-            Next
-          </button>
-        </div>
 
-        <canvas id="pdf-canvas" class="border w-full" style="height: auto;"></canvas>
-        <!-- PDF.js Initialization (Module version) -->
-      </div>
+          <canvas id="pdf-canvas" class="border w-full" style="height: auto;"></canvas>
+          <!-- PDF.js Initialization (Module version) -->
+        </div>
     <% end %>
   </div>
 </div>

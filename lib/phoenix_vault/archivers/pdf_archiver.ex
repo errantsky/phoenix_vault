@@ -3,14 +3,14 @@ defmodule PhoenixVault.Archivers.PdfArchiver do
   alias PhoenixVault.Repo
   alias PhoenixVault.Archivers.ArchiverConfig
   import Ecto.Query
-  
+
   use Oban.Worker, max_attempts: 3
 
   @impl Worker
   def perform(%Job{args: %{"snapshot_id" => snapshot_id, "snapshot_url" => snapshot_url}}) do
     # todo add error handling
     print_pdf_for_url(snapshot_id, snapshot_url)
-    
+
     from(
       s in Snapshot,
       where: s.id == ^snapshot_id,

@@ -10,7 +10,7 @@ defmodule PhoenixVaultWeb.SnapshotLive.BulkSnapshotComponent do
     ~H"""
     <div>
       <.header>
-        <%= @title %>
+        {@title}
         <:subtitle>Use this form to bulk create snapshot records in your database.</:subtitle>
       </.header>
 

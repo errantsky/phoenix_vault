@@ -1,5 +1,5 @@
 <.header>
-  Snapshot <%= @snapshot.id %>
+  Snapshot {@snapshot.id}
   <:subtitle>This is a snapshot record from your database.</:subtitle>
   <:actions>
     <.link patch={~p"/snapshots/#{@snapshot}/show/edit"} phx-click={JS.push_focus()}>
@@ -10,19 +10,19 @@
 
 <.list>
   <:item title="Title">
-    <%= @snapshot.title %>
+    {@snapshot.title}
   </:item>
   <:item title="URL">
-    <%= @snapshot.url %>
+    {@snapshot.url}
   </:item>
   <:item title="Tags">
-    <%= Enum.map(@snapshot.tags, fn tag -> tag.name end) |> Enum.join(", ") %>
+    {Enum.map(@snapshot.tags, fn tag -> tag.name end) |> Enum.join(", ")}
   </:item>
   <:item title="Inserted At">
-    <%= @snapshot.inserted_at %>
+    {@snapshot.inserted_at}
   </:item>
   <:item title="Updated At">
-    <%= @snapshot.updated_at %>
+    {@snapshot.updated_at}
   </:item>
 </.list>
 
